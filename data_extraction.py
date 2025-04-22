@@ -11,7 +11,7 @@ from config import ACCESS_TOKEN
 from user import User
 
 
-TIMING = 0.34
+TIMING = 0.21
 SIMULTANEOUS_APPEALS = 25
 
 # Отправка HTTP-запроса
