@@ -1,5 +1,6 @@
 import codecs
 import json
+import math
 
 from time import sleep
 from urllib.parse import urlencode
@@ -10,6 +11,7 @@ from user import User
 
 
 TIMING = 0.34
+SIMULTANEOUS_APPEALS = 25
 
 # Отправка HTTP-запроса
 def send_request(url: str, fields: dict) -> str:
@@ -66,6 +68,38 @@ def extract_friends_json(id: int) -> (str, dict):
     return str_friends
 
 
+# Ускоренное извлечение данных о списке друзей в формате JSON
+# Используется метод execute для выполнения множества обращений в рамках одного запроса
+def fast_extract_fr_friends_json(ids: list) -> list:
+    url = 'https://api.vk.com/method/execute'
+    fields = {
+        'code': '',
+        'access_token': ACCESS_TOKEN,
+        'lang': 'ru',
+        'v': '5.199',
+    }
+
+    result_jsons = []
+
+    for i in range(math.ceil(len(ids)/SIMULTANEOUS_APPEALS)):
+        script = 'return {'
+        for j in range(SIMULTANEOUS_APPEALS):
+            k = i*SIMULTANEOUS_APPEALS + j
+            if k < len(ids):
+                script += f'"{ids[k]}": API.friends.get({{"user_id": {ids[k]}, "fields": "bdate"}}),'
+        script = script[:-1] + '};'
+        fields['code'] = script
+
+        str_resp = send_request(url, fields)
+        dict_resp = json.loads(str_resp)
+        for k, v in dict_resp['response'].items():
+            result_jsons.append(f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}')
+
+        sleep(TIMING)
+
+    return result_jsons
+
+
 # Форматирование JSON в users и relations
 def json_to_objects(str_friends: str) -> (set, set):
     dict_friends = json.loads(str_friends)
@@ -74,13 +108,14 @@ def json_to_objects(str_friends: str) -> (set, set):
 
     try:
         user_id = dict_friends['id']
-        for friend in dict_friends['response']['items']:
-            friends.add(User(
-                friend['id'],
-                friend['first_name'],
-                friend['last_name']
-            ))
-            relations.add((min(user_id, friend['id']), max(user_id, friend['id'])))
+        if dict_friends['response']:
+            for friend in dict_friends['response']['items']:
+                friends.add(User(
+                    friend['id'],
+                    friend['first_name'],
+                    friend['last_name']
+                ))
+                relations.add((min(user_id, friend['id']), max(user_id, friend['id'])))
     except KeyError as e:
         if dict_friends['error']:
             pass
@@ -107,6 +142,32 @@ def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set, set):
     for friend in list(friends):
         sleep(TIMING)
         fr_friends, fr_relations = get_friends(friend.id)
+        if add_fr_friends:
+            friends.update(fr_friends)
+            users_ids.update([fr_friend.id for fr_friend in fr_friends])
+            relations.update(fr_relations)
+        else:
+            for fr_relation in fr_relations:
+                if fr_relation[0] in users_ids and fr_relation[1] in users_ids:
+                    relations.add(fr_relation)
+
+    return friends, relations
+
+
+# Ускоренное получение списка друзей и их друзей с отношениями
+def fast_get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set, set):
+    str_frs = fast_extract_fr_friends_json([id])[0]
+    friends, relations = json_to_objects(str_frs)
+
+    user = get_user_data(id)
+    friends.add(user)
+
+    users_ids = set([friend.id for friend in friends])
+
+    str_frs_frs = fast_extract_fr_friends_json(list(users_ids - {id}))
+
+    for str_fr_frs in str_frs_frs:
+        fr_friends, fr_relations = json_to_objects(str_fr_frs)
         if add_fr_friends:
             friends.update(fr_friends)
             users_ids.update([fr_friend.id for fr_friend in fr_friends])
