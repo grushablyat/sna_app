@@ -94,8 +94,11 @@ def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
 
         str_resp = send_request(url, fields)
         dict_resp = json.loads(str_resp)
-        for k, v in dict_resp['response'].items():
-            result_jsons.append(f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}')
+
+        result_jsons.extend(
+            [f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}'
+             for k, v in dict_resp['response'].items()]
+        )
 
         extract_time = time() - start
         if extract_time < TIMING:
