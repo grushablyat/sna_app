@@ -3,6 +3,7 @@ import json
 import math
 
 from time import sleep
+from typing import Collection
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -70,7 +71,7 @@ def extract_friends_json(id: int) -> (str, dict):
 
 # Ускоренное извлечение данных о списке друзей в формате JSON
 # Используется метод execute для выполнения множества обращений в рамках одного запроса
-def fast_extract_fr_friends_json(ids: list) -> list:
+def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
     url = 'https://api.vk.com/method/execute'
     fields = {
         'code': '',
@@ -101,7 +102,7 @@ def fast_extract_fr_friends_json(ids: list) -> list:
 
 
 # Форматирование JSON в users и relations
-def json_to_objects(str_friends: str) -> (set, set):
+def json_to_objects(str_friends: str) -> (set[User], set[tuple]):
     dict_friends = json.loads(str_friends)
     friends = set()
     relations = set()
@@ -124,7 +125,7 @@ def json_to_objects(str_friends: str) -> (set, set):
 
 
 # Получение списка друзей с отношениями
-def get_friends(id: int) -> (set, set):
+def get_friends(id: int) -> (set[User], set[tuple]):
     str_friends = extract_friends_json(id)
     friends, relations = json_to_objects(str_friends)
 
@@ -135,7 +136,7 @@ def get_friends(id: int) -> (set, set):
 
 
 # Получение списка друзей и их друзей с отношениями
-def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set, set):
+def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], set[tuple]):
     friends, relations = get_friends(id)
     users_ids = set([friend.id for friend in friends])
 
@@ -155,7 +156,7 @@ def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set, set):
 
 
 # Ускоренное получение списка друзей и их друзей с отношениями
-def fast_get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set, set):
+def fast_get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], set[tuple]):
     str_frs = fast_extract_fr_friends_json([id])[0]
     friends, relations = json_to_objects(str_frs)
 
@@ -213,7 +214,7 @@ def export_to_json(id: int, connect_fr_friends: bool=False, filename: str=None) 
 
 # Сложный импорт из JSON друзей и их друзей со ВСЕМИ отношениями
 # Некорректно работает при добавлении вторичных друзей и тем более их отношений
-def import_from_json(id: int, add_fr_friends: bool=False, add_fr_fr_cons: bool=False, filename: str=None) -> (set, set):
+def import_from_json(id: int, add_fr_friends: bool=False, add_fr_fr_cons: bool=False, filename: str=None) -> (set[User], set[tuple]):
     if not filename:
         filename = f'friends_{id}.json'
 
@@ -258,7 +259,7 @@ def import_from_json(id: int, add_fr_friends: bool=False, add_fr_fr_cons: bool=F
 
 
 # Простой экспорт в TXT готовых объектов пользователей и отношений
-def simple_export(id: int, users: set, relations: set, filename: str=None) -> None:
+def simple_export(id: int, users: Collection[User], relations: Collection[tuple], filename: str=None) -> None:
     if not filename:
         filename = f'users_relations_{id}.txt'
 
@@ -274,7 +275,7 @@ def simple_export(id: int, users: set, relations: set, filename: str=None) -> No
 
 
 # Простой импорт из TXT готовых объектов пользователей и отношений
-def simple_import(id: int, filename: str=None) -> (set, set):
+def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
     if not filename:
         filename = f'users_relations_{id}.txt'
 
