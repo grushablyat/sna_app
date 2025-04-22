@@ -2,7 +2,7 @@ import codecs
 import json
 import math
 
-from time import sleep
+from time import sleep, time
 from typing import Collection
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -81,6 +81,7 @@ def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
     }
 
     result_jsons = []
+    start = time()
 
     for i in range(math.ceil(len(ids)/SIMULTANEOUS_APPEALS)):
         script = 'return {'
@@ -96,7 +97,10 @@ def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
         for k, v in dict_resp['response'].items():
             result_jsons.append(f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}')
 
-        sleep(TIMING)
+        extract_time = time() - start
+        if extract_time < TIMING:
+            sleep(TIMING - extract_time)
+        start = time()
 
     return result_jsons
 
