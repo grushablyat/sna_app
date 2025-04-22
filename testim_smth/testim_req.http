@@ -1,0 +1,38 @@
+
+#POST https://api.vk.com/method/users.get
+#    ?user_ids=303071706
+#    &fields=friends
+#    &access_token=9cddc2969cddc2969cddc296ae9ff42dea99cdd9cddc296fb7260fbb817d574a44ab14d
+#    &v=5.199 HTTP/1.1
+
+
+#POST https://api.vk.com/method/friends.get
+#    ?user_id=327075058
+#    &order=hints
+#    &count=20
+#    &fields=bdate
+#    &access_token=9cddc2969cddc2969cddc296ae9ff42dea99cdd9cddc296fb7260fbb817d574a44ab14d
+#    &lang=ru
+#    &v=5.199 HTTP/1.1
+
+#POST https://api.vk.com/method/friends.get
+#    ?user_id=327075058
+#    &order=hints
+#    &fields=bdate
+#    &access_token=9cddc2969cddc2969cddc296ae9ff42dea99cdd9cddc296fb7260fbb817d574a44ab14d
+#    &lang=ru
+#    &v=5.199
+
+#POST https://api.vk.com/method/users.get
+#    ?user_ids=161473471
+#    &fields=bdate
+#    &access_token=9cddc2969cddc2969cddc296ae9ff42dea99cdd9cddc296fb7260fbb817d574a44ab14d
+#    &v=5.199
+
+POST https://api.vk.com/method/execute
+    ?code=var friends_327075058 = API.friends.get({"user_id": 327075058, "fields": "bdate"});
+    var friends_344920719 = API.friends.get({"user_id": 344920719, "fields": "bdate"});
+    var friends_303071706 = API.friends.get({"user_id": 303071706, "fields": "bdate"});
+    return [friends_327075058, friends_344920719, friends_303071706];
+    &access_token=9cddc2969cddc2969cddc296ae9ff42dea99cdd9cddc296fb7260fbb817d574a44ab14d
+    &v=5.199
