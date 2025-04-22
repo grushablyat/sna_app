@@ -258,13 +258,11 @@ def import_from_json(id: int, add_fr_friends: bool=False, add_fr_fr_cons: bool=F
 
 
 # Простой экспорт в TXT готовых объектов пользователей и отношений
-def simple_export(id: int, filename: str=None) -> None:
+def simple_export(id: int, users: set, relations: set, filename: str=None) -> None:
     if not filename:
         filename = f'users_relations_{id}.txt'
 
     filename = 'dumps/' + filename
-
-    users, relations = get_friends_and_friends(id)
 
     file = codecs.open(filename, 'w', encoding='utf-8')
     for user in users:
