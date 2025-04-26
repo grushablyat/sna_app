@@ -2,18 +2,18 @@ from gephistreamer import graph, streamer
 import random as rnd
 
 
-stream = streamer.Streamer(streamer.GephiWS(
-    hostname='localhost',
-    port=8080,
-    workspace='workspace1'
-))
+# stream = streamer.Streamer(streamer.GephiWS(
+#     hostname='localhost',
+#     port=8080,
+#     workspace='workspace1'
+# ))
 
 szfak = 25
 cdfak = 3000
 
 
 def create_gephi_test():
-    # stream = streamer.Streamer(streamer.GephiWS(hostname='localhost', port=8080, workspace='workspace1'))
+    stream = streamer.Streamer(streamer.GephiWS(hostname='localhost', port=8080, workspace='workspace1'))
 
     node_a = graph.Node('A', custom_property=1)
     node_b = graph.Node('B')
@@ -27,7 +27,7 @@ def create_gephi_test():
 
 
 def create_gephi_graph(nodes: list, edges: list):
-    # stream = streamer.Streamer(streamer.GephiWS(hostname='localhost', port=8080, workspace='workspace1'))
+    stream = streamer.Streamer(streamer.GephiWS(hostname='localhost', port=8080, workspace='workspace1'))
 
     for _ in range(3):
         stream.add_node(*[graph.Node(
@@ -38,4 +38,4 @@ def create_gephi_graph(nodes: list, edges: list):
             color="#ff8080",
             type="p",
         ) for node in nodes])
-        stream.add_edge(*[graph.Edge(edge[0], edge[1], directed=False) for edge in edges])
+        stream.add_edge(*[graph.Edge(edge[0], edge[1], eid=f'e{edge[0]}_{edge[1]}', directed=False) for edge in edges])
