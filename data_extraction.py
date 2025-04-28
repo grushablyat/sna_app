@@ -4,6 +4,7 @@ import math
 
 from time import sleep, time
 from typing import Collection
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -23,6 +24,8 @@ def send_request(url: str, fields: dict) -> str:
     except KeyError as e:
         print(e)
         return ''
+    except HTTPError as e:
+        return e.read()
 
 
 # Получение данных пользователя
@@ -95,10 +98,14 @@ def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
         str_resp = send_request(url, fields)
         dict_resp = json.loads(str_resp)
 
-        result_jsons.extend(
-            [f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}'
-             for k, v in dict_resp['response'].items()]
-        )
+        try:
+            result_jsons.extend(
+                [f'{{"id":{k},"response":{json.dumps(v, ensure_ascii=False, separators=(",", ":"))}}}'
+                 for k, v in dict_resp['response'].items()]
+            )
+        except KeyError as e:
+            print(e)
+            print(str_resp)
 
         extract_time = time() - start
         if extract_time < TIMING:
