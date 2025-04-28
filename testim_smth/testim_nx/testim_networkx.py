@@ -6,14 +6,20 @@ from networkx.algorithms.community import louvain_communities, modularity
 from matplotlib.cm import ScalarMappable
 
 
-def analyze_and_vizualize_graph(edges):
+def analyze_and_visualize_graph(nodes, edges: set):
+    if not edges:
+        print("No edges detected")
+        return
+
     edges = list(edges)
+
     # 1. Create graph (synthetic data, replace with API data, e.g., VK)
     G = nx.Graph()
     # edges = [
     #     (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (4, 5),
     #     (5, 6), (5, 7), (6, 7), (6, 8), (7, 8), (8, 9),
     # ]
+    G.add_nodes_from(nodes)
     G.add_edges_from(edges)
 
     # 2. Calculate centrality metrics
