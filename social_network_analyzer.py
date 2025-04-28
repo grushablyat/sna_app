@@ -120,7 +120,7 @@ class SocialNetworkAnalyzer:
             print("Ошибка: граф пуст")
             return
 
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(10, 8), dpi=500)
         pos = nx.spring_layout(self.graph, seed=42)
 
         # Размер узлов по междуности
@@ -144,7 +144,7 @@ class SocialNetworkAnalyzer:
         nx.draw_networkx_labels(self.graph, pos, font_size=10, ax=ax)
 
         plt.title("Social Network Graph: Colored by Community (if detected), Sized by Betweenness")
-        plt.savefig(output_file)
+        plt.savefig(output_file, bbox_inches='tight')
         plt.close()
         print(f"Визуализация сохранена в '{output_file}'")
 
