@@ -169,8 +169,8 @@ def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], 
     return friends, relations
 
 
-# Ускоренное получение списка друзей и их друзей с отношениями
-def fast_get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], set[tuple]):
+# Ускоренное получение списка друзей с отношениями
+def fast_get_friends(id: int) -> (set[User], set[tuple]):
     str_frs = fast_extract_fr_friends_json([id])[0]
     friends, relations = json_to_objects(str_frs)
 
@@ -183,14 +183,40 @@ def fast_get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[Us
 
     for str_fr_frs in str_frs_frs:
         fr_friends, fr_relations = json_to_objects(str_fr_frs)
-        if add_fr_friends:
-            friends.update(fr_friends)
-            users_ids.update([fr_friend.id for fr_friend in fr_friends])
-            relations.update(fr_relations)
-        else:
-            for fr_relation in fr_relations:
-                if fr_relation[0] in users_ids and fr_relation[1] in users_ids:
-                    relations.add(fr_relation)
+        for fr_relation in fr_relations:
+            if fr_relation[0] in users_ids and fr_relation[1] in users_ids:
+                relations.add(fr_relation)
+
+    return friends, relations
+
+
+# Ускоренное получение списка друзей и их друзей с отношениями
+def fast_get_friends_and_friends(id: int) -> (set[User], set[tuple]):
+    str_frs = fast_extract_fr_friends_json([id])[0]
+    friends, relations = json_to_objects(str_frs)
+
+    user = get_user_data(id)
+    friends.add(user)
+
+    users_ids = set([friend.id for friend in friends])
+
+    str_frs_frs = fast_extract_fr_friends_json(list(users_ids - {id}))
+
+    for str_fr_frs in str_frs_frs:
+        fr_friends, fr_relations = json_to_objects(str_fr_frs)
+
+        fr_frs_ids = [fr_friend.id for fr_friend in fr_friends]
+        friends.update(fr_friends)
+        users_ids.update(fr_frs_ids)
+        relations.update(fr_relations)
+
+        str_fr_frs_frs = fast_extract_fr_friends_json(fr_frs_ids)
+        for str_fr_fr_frs in str_fr_frs_frs:
+            fr_fr_friends, fr_fr_relations = json_to_objects(str_fr_fr_frs)
+
+            for fr_fr_relation in fr_fr_relations:
+                if fr_fr_relation[0] in users_ids and fr_fr_relation[1] in users_ids:
+                    relations.add(fr_fr_relation)
 
     return friends, relations
 
