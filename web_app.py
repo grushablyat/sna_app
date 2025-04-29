@@ -1,15 +1,9 @@
-from datetime import datetime
-from textwrap import dedent as d
-
-from colour import Color
 import dash
-from dash import dcc
-from dash import html
-import dash_bootstrap_components as dbc
-import networkx as nx
 import pandas as pd
-import plotly.graph_objs as go
 
+from layout import layout
+from data_extraction import simple_import
+from social_network_analyzer import SocialNetworkAnalyzer
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -17,255 +11,26 @@ app.title = 'Анализ дружеских связей пользовател
 
 TARGET_USER_ID = None
 
-YEAR=[2010, 2019]
-ACCOUNT="A0001"
-
-##############################################################################################################################################################
-############ Пример из интернета ############
-def network_graph(yearRange, AccountToSearch):
-
-    edge1 = pd.read_csv('edge1.csv')
-    node1 = pd.read_csv('node1.csv')
-
-    # filter the record by datetime, to enable interactive control through the input box
-    edge1['Datetime'] = "" # add empty Datetime column to edge1 dataframe
-    accountSet=set() # contain unique account
-    for index in range(0,len(edge1)):
-        # edge1['Datetime'][index] = datetime.strptime(edge1['Date'][index], '%d/%m/%Y')
-        edge1.loc[index,'Datetime'] = datetime.strptime(edge1['Date'][index], '%d/%m/%Y')
-        if edge1['Datetime'][index].year<yearRange[0] or edge1['Datetime'][index].year>yearRange[1]:
-            edge1.drop(axis=0, index=index, inplace=True)
-            continue
-        accountSet.add(edge1['Source'][index])
-        accountSet.add(edge1['Target'][index])
-
-    # to define the centric point of the networkx layout
-    shells=[]
-    shell1=[]
-    shell1.append(AccountToSearch)
-    shells.append(shell1)
-    shell2=[]
-    for ele in accountSet:
-        if ele!=AccountToSearch:
-            shell2.append(ele)
-    shells.append(shell2)
+app.layout = layout
 
 
-    G = nx.from_pandas_edgelist(edge1, 'Source', 'Target', ['Source', 'Target', 'TransactionAmt', 'Date'], create_using=nx.MultiDiGraph())
-    nx.set_node_attributes(G, node1.set_index('Account')['CustomerName'].to_dict(), 'CustomerName')
-    nx.set_node_attributes(G, node1.set_index('Account')['Type'].to_dict(), 'Type')
-    # pos = nx.layout.spring_layout(G)
-    # pos = nx.layout.circular_layout(G)
-    # nx.layout.shell_layout only works for more than 3 nodes
-    if len(shell2)>1:
-        pos = nx.drawing.layout.shell_layout(G, shells)
-    else:
-        pos = nx.drawing.layout.spring_layout(G)
-    for node in G.nodes:
-        G.nodes[node]['pos'] = list(pos[node])
+@app.callback(
+    # dash.dependencies.Output('title', 'children'),
+    dash.dependencies.Output('graph-image', 'src'),
+    dash.dependencies.Input('target-user-id-button', 'n_clicks'),
+    dash.dependencies.State('target-user-id-input', 'value'),
+    prevent_initial_call=True,
+)
+def target_user_id_button_clicked(n_clicks, input_value):
+    friends, relations = simple_import(input_value)
 
+    analyzer = SocialNetworkAnalyzer()
+    analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
+    analyzer.calculate_centralities()
+    analyzer.detect_communities()
+    analyzer.visualize(f'assets/network_graph_{input_value}.png')
 
-    if len(shell2)==0:
-        traceRecode = []  # contains edge_trace, node_trace, middle_node_trace
-
-        node_trace = go.Scatter(x=tuple([1]), y=tuple([1]), text=tuple([str(AccountToSearch)]), textposition="bottom center",
-                                mode='markers+text',
-                                marker={'size': 50, 'color': 'LightSkyBlue'})
-        traceRecode.append(node_trace)
-
-        node_trace1 = go.Scatter(x=tuple([1]), y=tuple([1]),
-                                mode='markers',
-                                marker={'size': 50, 'color': 'LightSkyBlue'},
-                                opacity=0)
-        traceRecode.append(node_trace1)
-
-        figure = {
-            "data": traceRecode,
-            "layout": go.Layout(title='Interactive Transaction Visualization', showlegend=False,
-                                margin={'b': 40, 'l': 40, 'r': 40, 't': 40},
-                                xaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                                yaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                                height=600
-                                )}
-        return figure
-
-
-    traceRecode = []  # contains edge_trace, node_trace, middle_node_trace
-    ############################################################################################################################################################
-    colors = list(
-            Color('white').range_to(Color('black'), len(G.edges()))
-    )
-    colors = ['rgb' + str(x.rgb) for x in colors]
-
-    index = 0
-    for edge in G.edges:
-        x0, y0 = G.nodes[edge[0]]['pos']
-        x1, y1 = G.nodes[edge[1]]['pos']
-        weight = float(G.edges[edge]['TransactionAmt']) / max(edge1['TransactionAmt']) * 10
-        trace = go.Scatter(x=tuple([x0, x1, None]), y=tuple([y0, y1, None]),
-                           mode='lines',
-                           line={'width': weight},
-                           marker=dict(color=colors[index]),
-                           line_shape='spline',
-                           opacity=1)
-        traceRecode.append(trace)
-        index = index + 1
-    ###############################################################################################################################################################
-    node_trace = go.Scatter(x=[], y=[], hovertext=[], text=[], mode='markers+text', textposition="bottom center",
-                            hoverinfo="text", marker={'size': 50, 'color': 'LightSkyBlue'})
-
-    index = 0
-    for node in G.nodes():
-        x, y = G.nodes[node]['pos']
-        # hovertext = "CustomerName: " + str(G.nodes[node]['CustomerName']) + "<br>" + "AccountType: " + str(
-        #     G.nodes[node]['Type'])
-        # text = node1['Account'][index]
-        node_trace['x'] += tuple([x])
-        node_trace['y'] += tuple([y])
-        # node_trace['hovertext'] += tuple([hovertext])
-        # node_trace['text'] += tuple([text])
-        index = index + 1
-
-    traceRecode.append(node_trace)
-    ################################################################################################################################################################
-    middle_hover_trace = go.Scatter(x=[], y=[], hovertext=[], mode='markers', hoverinfo="text",
-                                    marker={'size': 20, 'color': 'LightSkyBlue'},
-                                    opacity=0)
-
-    index = 0
-    for edge in G.edges:
-        x0, y0 = G.nodes[edge[0]]['pos']
-        x1, y1 = G.nodes[edge[1]]['pos']
-        hovertext = "From: " + str(G.edges[edge]['Source']) + "<br>" + "To: " + str(
-            G.edges[edge]['Target']) + "<br>" + "TransactionAmt: " + str(
-            G.edges[edge]['TransactionAmt']) + "<br>" + "TransactionDate: " + str(G.edges[edge]['Date'])
-        middle_hover_trace['x'] += tuple([(x0 + x1) / 2])
-        middle_hover_trace['y'] += tuple([(y0 + y1) / 2])
-        middle_hover_trace['hovertext'] += tuple([hovertext])
-        index = index + 1
-
-    traceRecode.append(middle_hover_trace)
-    #################################################################################################################################################################
-    figure = {
-        "data": traceRecode,
-        "layout": go.Layout(title='Interactive Transaction Visualization', showlegend=False, hovermode='closest',
-                            margin={'b': 40, 'l': 40, 'r': 40, 't': 40},
-                            xaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                            yaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                            height=600,
-                            clickmode='event+select',
-                            annotations=[
-                                dict(
-                                    ax=(G.nodes[edge[0]]['pos'][0] + G.nodes[edge[1]]['pos'][0]) / 2,
-                                    ay=(G.nodes[edge[0]]['pos'][1] + G.nodes[edge[1]]['pos'][1]) / 2, axref='x', ayref='y',
-                                    x=(G.nodes[edge[1]]['pos'][0] * 3 + G.nodes[edge[0]]['pos'][0]) / 4,
-                                    y=(G.nodes[edge[1]]['pos'][1] * 3 + G.nodes[edge[0]]['pos'][1]) / 4, xref='x', yref='y',
-                                    showarrow=True,
-                                    arrowhead=3,
-                                    arrowsize=4,
-                                    arrowwidth=1,
-                                    opacity=1
-                                ) for edge in G.edges]
-                            )}
-    return figure
-
-
-app.layout = html.Div([
-    ###################################### Заголовок ######################################
-    html.Div(
-        className='row',
-        children=[html.H1(app.title)],
-        style={'textAlign': 'center'},
-    ),
-    ###################################### Главный ряд ######################################
-    html.Div(
-        className='row',
-        children=[
-            ###################################### Левая панель ######################################
-            html.Div(
-                className='three columns',
-                children=[
-                    dcc.Markdown(d('''
-                    **ID пользователя**
-                    
-                    Укажите идентификатор интересуемого пользователя ВК:
-                    ''')),
-                    dcc.Input(
-                        id='target-user-id-input',
-                        type='text',
-                        placeholder='Введите ID',
-                        className='twelve columns',
-                    ),
-                    html.Br(),
-                    # dbc.Button('Начать анализ', id='target-user-id-button', color='primary', className='me-1'),
-                    html.Button(
-                        'Начать анализ',
-                        id='target-user-id-button',
-                        className='twelve columns')
-                ],
-            ),
-
-            ###################################### Граф в центре ######################################
-            html.Div(
-                className='five columns',
-                children=[
-                    html.Div(
-                        className='twelve columns',
-                        children=[
-                            html.H3('Граф дружеских связей'),
-                        ],
-                        style={'textAlign': 'center'},
-                    ),
-                    dcc.Tabs(
-                        className='twelve columns',
-                        id='central-graph-tabs',
-                        value='tab-1-nx-image',
-                        children=[
-                            dcc.Tab(
-                                ###################################### Изображение графа ######################################
-                                className='twelve columns',
-                                label='Image',
-                                value='tab-1-nx-image',
-                                children=[
-                                    html.Div(
-                                        className='twelve columns',
-                                        children=[
-                                            html.Img(
-                                                src=dash.get_asset_url('network_graph.png'),
-                                                alt='image',
-                                                className='twelve columns',
-                                            )
-                                        ]
-                                    ),
-                                ]
-                            ),
-                            dcc.Tab(
-                                ###################################### Интерактивный граф ######################################
-                                className='twelve columns',
-                                label='Interactive Graph',
-                                value='tab-2-interactive-graph',
-                                children=[
-                                    dcc.Graph(
-                                        className='twelve columns',
-                                        id='interactive-graph',
-                                        figure=network_graph(YEAR, ACCOUNT)),
-                                ]
-                            )
-                        ]
-                    ),
-                ]
-            ),
-
-            ###################################### Таблица справа ######################################
-            html.Div(
-                className='four columns',
-                children=[
-                    dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'), id='metrics-table')
-                ]
-            )
-        ]
-    )
-])
+    return dash.get_asset_url(f'network_graph_{input_value}.png')
 
 
 if __name__ == '__main__':
