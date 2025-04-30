@@ -90,9 +90,10 @@ layout = html.Div([
                                 id='options-checklist',
                                 options={
                                     'labels': 'Подписи узлов графа (ID пользователей)',
-                                    'communities': 'Выделение обнаруженных сообществ'
+                                    'communities': 'Выделение обнаруженных сообществ',
+                                    'historical': 'Использовать исторические данные (при наличии)',
                                 },
-                                value=['labels', 'communities'],
+                                value=['labels', 'communities', 'historical'],
                             ),
                             html.Button(
                                 'Обновить граф',

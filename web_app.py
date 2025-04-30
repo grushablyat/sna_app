@@ -1,3 +1,5 @@
+import os
+
 import dash
 import dash.dependencies as dd
 import pandas as pd
@@ -60,11 +62,13 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
 
         analyzer.calculate_centralities()
         analyzer.save_results()
-        analyzer.visualize(
-            f'assets/{filename}',
-            labels='labels' in options,
-            communities='communities' in options,
-        )
+
+        if not ('historical' in options and os.path.exists(f'assets/{filename}')):
+            analyzer.visualize(
+                f'assets/{filename}',
+                labels='labels' in options,
+                communities='communities' in options,
+            )
 
         result['graph-image'] = dash.get_asset_url(filename)
         break
