@@ -3,7 +3,7 @@ import dash.dependencies as dd
 import pandas as pd
 
 from layout import layout
-from data_extraction import simple_import
+from data_extraction import simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
@@ -26,19 +26,36 @@ app.layout = layout
     prevent_initial_call=True,
 )
 def target_user_id_button_clicked(n_clicks, input_value):
-    friends, relations = simple_import(input_value)
+    result = {
+        'graph-image': None,
+        'target-user-id-error': '',
+        'tables-tabs': 'tab-1-friends-table',
+    }
 
-    if not relations:
-        return None, 'Некорректный ID, возможно у пользователя закрытый профиль', 'tab-1-friends-table'
+    for _ in [0]:
+        user = get_user_data(input_value)
 
-    analyzer = SocialNetworkAnalyzer()
-    analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
-    analyzer.calculate_centralities()
-    analyzer.detect_communities()
-    analyzer.save_results()
-    analyzer.visualize(f'assets/network_graph_{input_value}.png')
+        if not user:
+            result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
+            break
 
-    return dash.get_asset_url(f'network_graph_{input_value}.png'), '', 'tab-1-friends-table'
+        friends, relations = simple_import(input_value)
+
+        if not relations:
+            result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
+            break
+
+        analyzer = SocialNetworkAnalyzer()
+        analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
+        analyzer.calculate_centralities()
+        analyzer.detect_communities()
+        analyzer.save_results()
+        analyzer.visualize(f'assets/network_graph_{input_value}.png')
+
+        result['graph-image'] = dash.get_asset_url(f'network_graph_{input_value}.png')
+        break
+
+    return [v for k, v in result.items()]
 
 
 # Tab switches
