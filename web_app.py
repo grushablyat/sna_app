@@ -2,12 +2,12 @@ import dash
 import dash.dependencies as dd
 import pandas as pd
 
-from layout import layout, external_stylesheets
+from layout import layout
 from data_extraction import simple_import
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__)
 app.title = 'Анализ дружеских связей пользователя ВК'
 
 TARGET_USER_ID = None
