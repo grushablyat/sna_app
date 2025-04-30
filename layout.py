@@ -118,25 +118,16 @@ layout = html.Div([
                         style={'textAlign': 'center'},
                     ),
                     # dcc.Tabs(
-                    #     className='twelve columns',
-                    #     id='central-graph-tabs',
-                    #     value='tab-1-nx-image',
-                    #     children=[
-                    #         dcc.Tab(
-                    #             ###################################### Изображение графа ######################################
-                    #             className='twelve columns',
-                    #             label='Image',
-                    #             value='tab-1-nx-image',
-                    #             children=[
-                                    html.Img(
-                                        id='graph-image',
-                                        # src=dash.get_asset_url('network_graph.png'),
-                                        src=None,
-                                        alt='image',
-                                        className='twelve columns',
-                                    ),
-                    #             ]
-                    #         ),
+                        # className='twelve columns',
+                        # id='central-graph-tabs',
+                        # value='tab-1-nx-image',
+                        # children=[
+                        #     dcc.Tab(
+                        #         ###################################### Изображение графа ######################################
+                        #         className='twelve columns',
+                        #         # label='Image',
+                        #         value='tab-1-nx-image',
+                        #     ),
                     #         dcc.Tab(
                     #             ###################################### Интерактивный граф ######################################
                     #             ### Don't sure if we need to create interactive graph, but may be ###
@@ -153,8 +144,16 @@ layout = html.Div([
                     #                 ),
                     #             ]
                     #         )
-                    #     ]
+                    #     ],
+                    #     style={'height': '0px'},
                     # ),
+                    html.Img(
+                        id='graph-image',
+                        # src=dash.get_asset_url('network_graph.png'),
+                        src=None,
+                        alt='image',
+                        className='twelve columns',
+                    ),
                 ]
             ),
 
