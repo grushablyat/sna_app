@@ -139,8 +139,8 @@ class SocialNetworkAnalyzer:
             max_community = max(self.partition.values())
             cmap = plt.get_cmap('tab20', max_community + 1)
             # Цветовая шкала
-            sm = ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=max_community))
-            fig.colorbar(sm, ax=ax, label='Community')
+            # sm = ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=max_community))
+            # fig.colorbar(sm, ax=ax, label='Community')
         else:
             colors = '#ff9f0f'  # Единый цвет, если сообщества не обнаружены
             cmap = None
@@ -151,7 +151,7 @@ class SocialNetworkAnalyzer:
         if labels:
             nx.draw_networkx_labels(self.graph, pos, font_size=10, ax=ax)
 
-        plt.title("Social Network Graph: Colored by Community (if detected), Sized by Betweenness")
+        # plt.title("Social Network Graph: Colored by Community (if detected), Sized by Betweenness")
         plt.savefig(output_file, bbox_inches='tight')
         plt.close()
         print(f"Визуализация сохранена в '{output_file}'")
