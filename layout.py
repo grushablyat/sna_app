@@ -23,28 +23,36 @@ layout = html.Div([
                 id='left-bar',
                 className='three columns',
                 children=[
-                    html.Div([
-                        dcc.Markdown(d('''
-                        **ID пользователя**
-    
-                        Укажите идентификатор интересуемого пользователя ВК:
-                        ''')),
-                        dcc.Input(
-                            id='target-user-id-input',
-                            type='number',
-                            min=0, max=10000000000,
-                            placeholder='Введите ID',
-                            className='twelve columns',
-                        ),
-                        html.Br(),
-                        # dbc.Button('Начать анализ', id='target-user-id-button', color='primary', className='me-1'),
-                        html.Button(
-                            'Начать анализ',
-                            id='target-user-id-button',
-                            n_clicks=0,
-                            className='twelve columns')
-                    ]),
-                    ### There will be option panel (labels inclusion, communities coloring checkboxes) ###
+                    ###################################### Target user ID section ######################################
+                    html.Div(
+                        id='target-user-id-section',
+                        className='twelve columns',
+                        children=[
+                            dcc.Markdown(d('''
+                            **ID пользователя**
+        
+                            Укажите идентификатор интересуемого пользователя ВК:
+                            ''')),
+                            dcc.Input(
+                                id='target-user-id-input',
+                                type='number',
+                                min=0, max=10000000000,
+                                placeholder='Введите ID',
+                                className='twelve columns',
+                            ),
+                            html.Br(),
+                            html.Button(
+                                'Начать анализ',
+                                id='target-user-id-button',
+                                n_clicks=0,
+                                className='twelve columns'
+                            ),
+                            dcc.Markdown(
+                                id='target-user-id-error',
+                                style={'color': 'red'},
+                            ),
+                        ],
+                    ),
                 ],
             ),
 
