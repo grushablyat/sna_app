@@ -173,31 +173,25 @@ layout = html.Div([
                         ],
                         style={'textAlign': 'center'},
                     ),
-                    # dcc.Tabs(
-                    #     id='tables-tabs',
-                    #     className='twelve columns',
-                    #     value='tab-1-friends-table',
-                    #     children=[
-                    #         ###################################### Таблица друзей ######################################
-                    #         dcc.Tab(
-                    #             value='tab-1-friends-table',
-                    #             label='Друзья',
-                    #         ),
-                    #         ###################################### Таблица по метрикам ######################################
-                    #         dcc.Tab(
-                    #             value='tab-2-metrics-table',
-                    #             label='Метрики',
-                    #         ),
-                    #     ],
-                    # ),
-                    dcc.RadioItems(
-                        id='table-radio-button',
-                        options={
-                            'friends': 'Friends',
-                            'metrics': 'Metrics',
-                        },
+                    dcc.Tabs(
+                        id='tables-tabs',
+                        className='twelve columns',
+                        value='tab-1-friends-table',
+                        children=[
+                            dcc.Tab(
+                                value='tab-1-friends-table',
+                                label='Друзья',
+                            ),
+                            dcc.Tab(
+                                value='tab-2-metrics-table',
+                                label='Метрики',
+                            ),
+                        ],
                     ),
-                    html.Div(id='table-place'),
+                    html.Div(
+                        id='table-place',
+                        className='twelve columns',
+                    ),
                 ],
             ),
         ],

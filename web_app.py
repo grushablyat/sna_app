@@ -40,31 +40,18 @@ def target_user_id_button_clicked(n_clicks, input_value):
     return dash.get_asset_url(f'network_graph_{input_value}.png'), ''
 
 
+# Tab switches
 @app.callback(
     dd.Output('table-place', 'children'),
-    dd.Input('table-radio-button', 'value'),
+    dd.Input('tables-tabs', 'value'),
+    prevent_initial_call=True,
 )
-def switch_tables(value):
-    if value == 'friends':
+def switch_table_tab(value):
+    if value == 'tab-1-friends-table':
         return dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'))
-    elif value == 'metrics':
-        return dash.dash_table.DataTable(None)
+    if value == 'tab-2-metrics-table':
+        return dash.dash_table.DataTable(pd.read_csv('test_metrics.csv').to_dict('records'))
     return dash.dash_table.DataTable(None)
-
-
-# # Tab switches
-# @app.callback(
-#     dd.Output('table-place', 'children'),
-#     dd.Input('tables-tabs', 'value'),
-#     # dd.Input('friends-button', 'n_clicks'),
-#     # dd.State('target-user-id-input', 'value'),
-# )
-# def switch_table_tab(value):
-#     if value == 'tab-1-friends-table':
-#         return dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'))
-#     if value == 'tab-2-friends-table':
-#         return dash.dash_table.DataTable(None)
-#     return None
 
 
 if __name__ == '__main__':
