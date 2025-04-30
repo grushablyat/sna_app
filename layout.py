@@ -52,6 +52,57 @@ layout = html.Div([
                                 style={'color': 'red'},
                             ),
                         ],
+                        style={'height': '250px'},
+                    ),
+                    ###################################### Analyzer section ######################################
+                    html.Div(
+                        id='analyzer-section',
+                        className='twelve columns',
+                        children=[
+                            dcc.Markdown(d('''
+                            **Анализ связей**
+                            ''')),
+                            html.Button(
+                                'Вычислить центральности',
+                                id='calculate-centralities-button',
+                                className='twelve columns',
+                                n_clicks=0,
+                            ),
+                            html.Button(
+                                'Обнаружить сообщества',
+                                id='detect-communities-button',
+                                className='twelve columns',
+                                n_clicks=0,
+                            ),
+                        ],
+                        style={'height': '250px'},
+                    ),
+                    ###################################### Options section ######################################
+                    html.Div(
+                        id='options-section',
+                        className='twelve columns',
+                        children=[
+                            dcc.Markdown(d('''
+                            **Опции**
+                            
+                            Выберите необходимые опции:
+                            ''')),
+                            dcc.Checklist(
+                                id='options-checklist',
+                                options={
+                                    'labels': 'Подписи узлов графа (ID пользователей)',
+                                    'communities': 'Выделение обнаруженных сообществ'
+                                },
+                                value=['labels', 'communities'],
+                            ),
+                            html.Button(
+                                'Обновить граф',
+                                id='apply-graph-options-button',
+                                className='twelve columns',
+                                n_clicks=0,
+                            )
+                        ],
+                        style={'height': '250px'},
                     ),
                 ],
             ),
