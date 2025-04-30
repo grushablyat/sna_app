@@ -19,6 +19,7 @@ app.layout = layout
     [
         dd.Output('graph-image', 'src'),
         dd.Output('target-user-id-error', 'children'),
+        dd.Output('tables-tabs', 'value'),
     ],
     dd.Input('target-user-id-button', 'n_clicks'),
     dd.State('target-user-id-input', 'value'),
@@ -28,7 +29,7 @@ def target_user_id_button_clicked(n_clicks, input_value):
     friends, relations = simple_import(input_value)
 
     if not relations:
-        return None, 'Некорректный ID, возможно у пользователя закрытый профиль'
+        return None, 'Некорректный ID, возможно у пользователя закрытый профиль', 'tab-1-friends-table'
 
     analyzer = SocialNetworkAnalyzer()
     analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
@@ -37,7 +38,7 @@ def target_user_id_button_clicked(n_clicks, input_value):
     analyzer.save_results()
     analyzer.visualize(f'assets/network_graph_{input_value}.png')
 
-    return dash.get_asset_url(f'network_graph_{input_value}.png'), ''
+    return dash.get_asset_url(f'network_graph_{input_value}.png'), '', 'tab-1-friends-table'
 
 
 # Tab switches
