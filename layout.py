@@ -131,17 +131,12 @@ layout = html.Div([
                     #             label='Image',
                     #             value='tab-1-nx-image',
                     #             children=[
-                                    html.Div(
+                                    html.Img(
+                                        id='graph-image',
+                                        # src=dash.get_asset_url('network_graph.png'),
+                                        src=None,
+                                        alt='image',
                                         className='twelve columns',
-                                        children=[
-                                            html.Img(
-                                                id='graph-image',
-                                                # src=dash.get_asset_url('network_graph.png'),
-                                                src=None,
-                                                alt='image',
-                                                className='twelve columns',
-                                            )
-                                        ]
                                     ),
                     #             ]
                     #         ),
@@ -168,16 +163,43 @@ layout = html.Div([
 
             ###################################### Таблица справа ######################################
             html.Div(
+                id='tables-section',
                 className='four columns',
                 children=[
-                    # dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'), id='metrics-table')
-                    dash.dash_table.DataTable(None, id='metrics-table')
-
-                    ### There will be tabs with metrics
-                    ### Every tab will contain button to calculate a metric and table of top nodes by current metric
-                    ### Button click callback function will update table
-                ]
-            )
-        ]
-    )
+                    html.Div(
+                        className='twelve columns',
+                        children=[
+                            html.H3('Таблицы друзей'),
+                        ],
+                        style={'textAlign': 'center'},
+                    ),
+                    # dcc.Tabs(
+                    #     id='tables-tabs',
+                    #     className='twelve columns',
+                    #     value='tab-1-friends-table',
+                    #     children=[
+                    #         ###################################### Таблица друзей ######################################
+                    #         dcc.Tab(
+                    #             value='tab-1-friends-table',
+                    #             label='Друзья',
+                    #         ),
+                    #         ###################################### Таблица по метрикам ######################################
+                    #         dcc.Tab(
+                    #             value='tab-2-metrics-table',
+                    #             label='Метрики',
+                    #         ),
+                    #     ],
+                    # ),
+                    dcc.RadioItems(
+                        id='table-radio-button',
+                        options={
+                            'friends': 'Friends',
+                            'metrics': 'Metrics',
+                        },
+                    ),
+                    html.Div(id='table-place'),
+                ],
+            ),
+        ],
+    ),
 ])

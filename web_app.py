@@ -1,4 +1,5 @@
 import dash
+import dash.dependencies as dd
 import pandas as pd
 
 from layout import layout, external_stylesheets
@@ -15,13 +16,12 @@ app.layout = layout
 
 
 @app.callback(
-    # dash.dependencies.Output('title', 'children'),
     [
-        dash.dependencies.Output('graph-image', 'src'),
-        dash.dependencies.Output('target-user-id-error', 'children'),
+        dd.Output('graph-image', 'src'),
+        dd.Output('target-user-id-error', 'children'),
     ],
-    dash.dependencies.Input('target-user-id-button', 'n_clicks'),
-    dash.dependencies.State('target-user-id-input', 'value'),
+    dd.Input('target-user-id-button', 'n_clicks'),
+    dd.State('target-user-id-input', 'value'),
     prevent_initial_call=True,
 )
 def target_user_id_button_clicked(n_clicks, input_value):
@@ -34,9 +34,37 @@ def target_user_id_button_clicked(n_clicks, input_value):
     analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
     analyzer.calculate_centralities()
     analyzer.detect_communities()
+    analyzer.save_results()
     analyzer.visualize(f'assets/network_graph_{input_value}.png')
 
     return dash.get_asset_url(f'network_graph_{input_value}.png'), ''
+
+
+@app.callback(
+    dd.Output('table-place', 'children'),
+    dd.Input('table-radio-button', 'value'),
+)
+def switch_tables(value):
+    if value == 'friends':
+        return dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'))
+    elif value == 'metrics':
+        return dash.dash_table.DataTable(None)
+    return dash.dash_table.DataTable(None)
+
+
+# # Tab switches
+# @app.callback(
+#     dd.Output('table-place', 'children'),
+#     dd.Input('tables-tabs', 'value'),
+#     # dd.Input('friends-button', 'n_clicks'),
+#     # dd.State('target-user-id-input', 'value'),
+# )
+# def switch_table_tab(value):
+#     if value == 'tab-1-friends-table':
+#         return dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'))
+#     if value == 'tab-2-friends-table':
+#         return dash.dash_table.DataTable(None)
+#     return None
 
 
 if __name__ == '__main__':
