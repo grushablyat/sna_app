@@ -92,21 +92,28 @@ class SocialNetworkAnalyzer:
             print("Ошибка: граф пуст")
             return
 
+        results = {
+            'UserID': list(self.graph.nodes()),
+        }
+
+        if self.betweenness:
+            results['Betweenness'] = [self.betweenness.get(node, 0) for node in self.graph.nodes()]
+        if self.eigenvector:
+            results['Eigenvector'] = [self.eigenvector.get(node, 0) for node in self.graph.nodes()]
+        if self.pagerank:
+            results['PageRank'] = [self.pagerank.get(node, 0) for node in self.graph.nodes()]
+        if self.communities and self.partition:
+            results['Communities'] = [self.partition.get(node, -1) for node in self.graph.nodes()]
+
         if not self.betweenness \
-                or not self.eigenvector \
-                or not self.pagerank \
-                or not self.communities \
-                or not self.partition:
+            and not self.eigenvector \
+            and not self.pagerank \
+            and not self.communities \
+            and not self.partition:
             print('Ошибка: метрики не вычислены')
             return
 
-        self.results = pd.DataFrame({
-            'UserID': list(self.graph.nodes()),
-            'Betweenness': [self.betweenness.get(node, 0) for node in self.graph.nodes()],
-            'Eigenvector': [self.eigenvector.get(node, 0) for node in self.graph.nodes()],
-            'PageRank': [self.pagerank.get(node, 0) for node in self.graph.nodes()],
-            'Community': [self.partition.get(node, -1) for node in self.graph.nodes()]
-        })
+        self.results = pd.DataFrame(results)
 
         self.results = self.results.sort_values(by='Betweenness', ascending=False)
         self.results.to_csv(output_file, index=False)
@@ -114,7 +121,7 @@ class SocialNetworkAnalyzer:
         print("\nТоп-5 узлов по междуности:")
         print(self.results.head())
 
-    def visualize(self, output_file='network_graph.png'):
+    def visualize(self, output_file='network_graph.png', labels=True, communities=True):
         """Визуализация графа: цвет по сообществам (если есть), размер по междуности."""
         if not self.graph.nodes:
             print("Ошибка: граф пуст")
@@ -127,7 +134,7 @@ class SocialNetworkAnalyzer:
         sizes = [self.betweenness.get(node, 0) * 5000 + 100 for node in self.graph.nodes()]
 
         # Цвет узлов: по сообществам, если они есть, иначе единый цвет
-        if self.partition:
+        if communities and self.partition:
             colors = [self.partition.get(node, -1) for node in self.graph.nodes()]
             max_community = max(self.partition.values())
             cmap = plt.get_cmap('tab20', max_community + 1)
@@ -141,7 +148,8 @@ class SocialNetworkAnalyzer:
         # Рисуем узлы и ребра
         nx.draw_networkx_nodes(self.graph, pos, node_color=colors, cmap=cmap, node_size=sizes, ax=ax)
         nx.draw_networkx_edges(self.graph, pos, alpha=0.5, ax=ax)
-        nx.draw_networkx_labels(self.graph, pos, font_size=10, ax=ax)
+        if labels:
+            nx.draw_networkx_labels(self.graph, pos, font_size=10, ax=ax)
 
         plt.title("Social Network Graph: Colored by Community (if detected), Sized by Betweenness")
         plt.savefig(output_file, bbox_inches='tight')
