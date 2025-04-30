@@ -5,6 +5,8 @@ from dash import dcc
 from dash import html
 
 
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 layout = html.Div([
     ###################################### Заголовок ######################################
     html.Div(

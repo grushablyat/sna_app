@@ -1,11 +1,11 @@
 import dash
 import pandas as pd
 
-from layout import layout
+from layout import layout, external_stylesheets
 from data_extraction import simple_import
 from social_network_analyzer import SocialNetworkAnalyzer
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = 'Анализ дружеских связей пользователя ВК'
 
