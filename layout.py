@@ -188,6 +188,10 @@ layout = html.Div([
                     html.Div(
                         id='table-place',
                         className='twelve columns',
+                        style={
+                            'height': '70vh',
+                            'overflow': 'scroll',
+                        }
                     ),
                 ],
             ),
