@@ -22,10 +22,13 @@ app.layout = layout
         dd.Output('tables-tabs', 'value'),
     ],
     dd.Input('target-user-id-button', 'n_clicks'),
-    dd.State('target-user-id-input', 'value'),
+    [
+        dd.State('target-user-id-input', 'value'),
+        dd.State('options-checklist', 'value'),
+    ],
     prevent_initial_call=True,
 )
-def target_user_id_button_clicked(n_clicks, input_value):
+def target_user_id_button_clicked(n_clicks, input_value, options):
     result = {
         'graph-image': None,
         'target-user-id-error': '',
@@ -45,14 +48,25 @@ def target_user_id_button_clicked(n_clicks, input_value):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
+        filename = (f'{input_value}_'
+                    f'{"l" if "labels" in options else "n"}_'
+                    f'{"c" if "communities" in options else "n"}.png')
+
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
-        analyzer.calculate_centralities()
-        analyzer.detect_communities()
-        analyzer.save_results()
-        analyzer.visualize(f'assets/network_graph_{input_value}.png')
 
-        result['graph-image'] = dash.get_asset_url(f'network_graph_{input_value}.png')
+        if 'communities' in options:
+            analyzer.detect_communities()
+
+        analyzer.calculate_centralities()
+        analyzer.save_results()
+        analyzer.visualize(
+            f'assets/{filename}',
+            labels='labels' in options,
+            communities='communities' in options,
+        )
+
+        result['graph-image'] = dash.get_asset_url(filename)
         break
 
     return [v for k, v in result.items()]
