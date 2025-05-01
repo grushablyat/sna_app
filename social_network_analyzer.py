@@ -18,13 +18,16 @@ class SocialNetworkAnalyzer:
         self.partition = {}
         self.modularity_score = 0.0
         self.results = None
+        self.users = []
 
-    def load_from_edges(self, nodes=None, edges=None):
+    def load_from_edges(self, nodes=None, edges=None, users=None):
         """Загрузка графа из списка узлов и ребер."""
         if edges is None or not edges:
             print("Ошибка: ребра не предоставлены или пусты")
             return False
         self.graph.clear()
+        if users:
+            self.users = list(users)
         if nodes:
             self.graph.add_nodes_from(nodes)
         self.graph.add_edges_from(edges)
@@ -49,6 +52,26 @@ class SocialNetworkAnalyzer:
         except Exception as e:
             print(f"Ошибка при загрузке файла: {e}")
             return False
+
+    def save_friends_list(self, output_file='friends_list.csv'):
+        """Сохранение результатов в CSV."""
+        if not self.graph.nodes or not self.users:
+            print("Ошибка: граф пуст")
+            return
+
+        results = {
+            'ID': [user.id for user in self.users],
+            'Имя': [user.first_name for user in self.users],
+            'Фамилия': [user.last_name for user in self.users],
+        }
+
+        self.results = pd.DataFrame(results)
+
+        self.results = self.results.sort_values(by='ID', ascending=True)
+        self.results.to_csv(output_file, index=False)
+        print(f"Результаты сохранены в '{output_file}'")
+        # print("\nТоп-5 узлов по междуности:")
+        # print(self.results.head())
 
     def calculate_centralities(self):
         """Расчет метрик центральности (посредническая, собственная, PageRank)."""

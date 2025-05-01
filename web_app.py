@@ -50,27 +50,31 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
-        filename = (f'{input_value}_'
+        friends_filename = f'friends_list_{input_value}.csv'
+        image_filename = (f'graph_image_{input_value}_'
                     f'{"l" if "labels" in options else "n"}_'
                     f'{"c" if "communities" in options else "n"}.png')
 
         analyzer = SocialNetworkAnalyzer()
-        analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations)
+        analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
 
         if 'communities' in options:
             analyzer.detect_communities()
 
-        analyzer.calculate_centralities()
-        analyzer.save_results()
+        # analyzer.calculate_centralities()
+        # analyzer.save_results()
 
-        if not ('historical' in options and os.path.exists(f'assets/{filename}')):
+        if not ('historical' in options and os.path.exists(f'assets/{image_filename}')):
             analyzer.visualize(
-                f'assets/{filename}',
+                f'assets/{image_filename}',
                 labels='labels' in options,
                 communities='communities' in options,
             )
 
-        result['graph-image'] = dash.get_asset_url(filename)
+        if not ('historical' in options and os.path.exists(f'tables/{friends_filename}')):
+            analyzer.save_friends_list(output_file=f'tables/{friends_filename}')
+
+        result['graph-image'] = dash.get_asset_url(image_filename)
         break
 
     return [v for k, v in result.items()]
@@ -80,12 +84,13 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
 @app.callback(
     dd.Output('table-place', 'children'),
     dd.Input('tables-tabs', 'value'),
+    dd.State('target-user-id-input', 'value'),
     prevent_initial_call=True,
 )
-def switch_table_tab(value):
-    if value == 'tab-1-friends-table':
-        return dash.dash_table.DataTable(pd.read_csv('network_metrics.csv').to_dict('records'))
-    if value == 'tab-2-metrics-table':
+def switch_table_tab(current_tab, input_value):
+    if current_tab == 'tab-1-friends-table':
+        return dash.dash_table.DataTable(pd.read_csv(f'tables/friends_list_{input_value}.csv').to_dict('records'))
+    if current_tab == 'tab-2-metrics-table':
         return dash.dash_table.DataTable(pd.read_csv('test_metrics.csv').to_dict('records'))
     return dash.dash_table.DataTable(None)
 
