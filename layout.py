@@ -39,7 +39,13 @@ layout = html.Div([
                                 placeholder='Введите ID',
                                 className='twelve columns',
                             ),
-                            html.Br(),
+                            dcc.Checklist(
+                                id='historical-checklist',
+                                options={
+                                    'historical': 'Использовать исторические данные (при наличии)',
+                                },
+                                value=['historical'],
+                            ),
                             html.Button(
                                 'Начать анализ',
                                 id='target-user-id-button',
@@ -68,9 +74,8 @@ layout = html.Div([
                                 options={
                                     'labels': 'Подписи узлов графа (ID пользователей)',
                                     'communities': 'Выделение обнаруженных сообществ',
-                                    'historical': 'Использовать исторические данные (при наличии)',
                                 },
-                                value=['labels', 'communities', 'historical'],
+                                value=['labels', 'communities'],
                             ),
                             html.Button(
                                 'Обновить граф',
@@ -79,7 +84,7 @@ layout = html.Div([
                                 n_clicks=0,
                             )
                         ],
-                        style={'height': '250px'},
+                        style={'height': '300px'},
                     ),
                 ],
             ),

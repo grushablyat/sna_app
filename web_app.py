@@ -17,24 +17,25 @@ TARGET_USER_ID = None
 app.layout = layout
 
 
+# Start analysis
 @app.callback(
     [
-        dd.Output('graph-image', 'src'),
         dd.Output('target-user-id-error', 'children'),
         dd.Output('tables-tabs', 'value'),
+        dd.Output('apply-graph-options-button', 'n_clicks')
     ],
     dd.Input('target-user-id-button', 'n_clicks'),
     [
         dd.State('target-user-id-input', 'value'),
-        dd.State('options-checklist', 'value'),
+        dd.State('historical-checklist', 'value'),
     ],
     prevent_initial_call=True,
 )
 def target_user_id_button_clicked(n_clicks, input_value, options):
     result = {
-        'graph-image': None,
         'target-user-id-error': '',
         'tables-tabs': 'tab-1-friends-table',
+        'apply-graph-options-button': -1,
     }
 
     for _ in [0]:
@@ -55,36 +56,59 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             break
 
         friends_filename = f'friends_list_{input_value}.csv'
-        image_filename = (f'graph_image_{input_value}_'
-                    f'{"l" if "labels" in options else "n"}_'
-                    f'{"c" if "communities" in options else "n"}.png')
+
+        image_filename = lambda l, c: f'graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
 
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
 
-        if 'communities' in options:
-            analyzer.detect_communities()
+        if not ('historical' in options and os.path.exists(f'tables/{friends_filename}')):
+            analyzer.save_friends_list(output_file=f'tables/{friends_filename}')
 
         analyzer.calculate_centralities()
         analyzer.save_results()
 
-        if not ('historical' in options and os.path.exists(f'assets/{image_filename}')):
+        for labels in (False, True):
             analyzer.visualize(
-                f'assets/{image_filename}',
-                labels='labels' in options,
-                communities='communities' in options,
+                f'assets/{image_filename(labels, False)}',
+                labels=labels,
+                communities=False,
             )
 
-        if not ('historical' in options and os.path.exists(f'tables/{friends_filename}')):
-            analyzer.save_friends_list(output_file=f'tables/{friends_filename}')
+        analyzer.detect_communities()
 
-        result['graph-image'] = dash.get_asset_url(image_filename)
+        for labels in (False, True):
+            analyzer.visualize(
+                f'assets/{image_filename(labels, True)}',
+                labels=labels,
+                communities=True,
+            )
+
         break
 
     return [v for k, v in result.items()]
 
 
-# Tab switches
+# Show graph image with options by pushing apply button
+@app.callback(
+    dd.Output('graph-image', 'src'),
+    dd.Input('apply-graph-options-button', 'n_clicks'),
+    [
+        dd.State('target-user-id-input', 'value'),
+        dd.State('options-checklist', 'value'),
+    ]
+)
+def apply_graph_options_button_clicked(n_clicks, input_value, options):
+    image_filename = (f'graph_image_{input_value}_'
+                f'{"l" if "labels" in options else "n"}_'
+                f'{"c" if "communities" in options else "n"}.png')
+
+    if os.path.exists(f'assets/{image_filename}'):
+        return dash.get_asset_url(image_filename)
+    else:
+        return None
+
+
 @app.callback(
     dd.Output('table-place', 'children'),
     dd.Input('tables-tabs', 'value'),
