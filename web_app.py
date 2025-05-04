@@ -57,7 +57,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
 
         friends_filename = f'friends_list_{input_value}.csv'
 
-        image_filename = lambda l, c: f'graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
+        image_filename = lambda l, c: f'assets/graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
 
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
@@ -70,7 +70,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
 
         for labels in (False, True):
             analyzer.visualize(
-                f'assets/{image_filename(labels, False)}',
+                image_filename(labels, False),
                 labels=labels,
                 communities=False,
             )
@@ -79,7 +79,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
 
         for labels in (False, True):
             analyzer.visualize(
-                f'assets/{image_filename(labels, True)}',
+                image_filename(labels, True),
                 labels=labels,
                 communities=True,
             )

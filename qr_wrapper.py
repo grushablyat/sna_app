@@ -1,5 +1,3 @@
-import sys
-
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -16,9 +14,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.browser)
 
 
-def start_qt_app(host, port):
-    qt_app = QApplication(sys.argv)
+def start_qt_app(host, port, argv):
+    qt_app = QApplication(argv)
     window = MainWindow(host, port)
     window.show()
-    sys.exit(qt_app.exec_())
-    # return qt_app
+    return qt_app.exec_()
