@@ -57,7 +57,7 @@ layout = html.Div([
                                 style={'color': 'red'},
                             ),
                         ],
-                        style={'height': '250px'},
+                        style={'height': '300px'},
                     ),
                     ###################################### Options section ######################################
                     html.Div(
