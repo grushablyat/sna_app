@@ -53,29 +53,6 @@ layout = html.Div([
                         ],
                         style={'height': '250px'},
                     ),
-                    ###################################### Analyzer section ######################################
-                    html.Div(
-                        id='analyzer-section',
-                        className='twelve columns',
-                        children=[
-                            dcc.Markdown(d('''
-                            **Анализ связей**
-                            ''')),
-                            html.Button(
-                                'Вычислить центральности',
-                                id='calculate-centralities-button',
-                                className='twelve columns',
-                                n_clicks=0,
-                            ),
-                            html.Button(
-                                'Обнаружить сообщества',
-                                id='detect-communities-button',
-                                className='twelve columns',
-                                n_clicks=0,
-                            ),
-                        ],
-                        style={'height': '250px'},
-                    ),
                     ###################################### Options section ######################################
                     html.Div(
                         id='options-section',
@@ -118,39 +95,8 @@ layout = html.Div([
                         ],
                         style={'textAlign': 'center'},
                     ),
-                    # dcc.Tabs(
-                        # className='twelve columns',
-                        # id='central-graph-tabs',
-                        # value='tab-1-nx-image',
-                        # children=[
-                        #     dcc.Tab(
-                        #         ###################################### Изображение графа ######################################
-                        #         className='twelve columns',
-                        #         # label='Image',
-                        #         value='tab-1-nx-image',
-                        #     ),
-                    #         dcc.Tab(
-                    #             ###################################### Интерактивный граф ######################################
-                    #             ### Don't sure if we need to create interactive graph, but may be ###
-                    #             #####################################################################
-                    #             className='twelve columns',
-                    #             label='Interactive Graph',
-                    #             value='tab-2-interactive-graph',
-                    #             children=[
-                    #                 dcc.Graph(
-                    #                     className='twelve columns',
-                    #                     id='interactive-graph',
-                    #                     # figure=network_graph(YEAR, ACCOUNT)),
-                    #                     figure=None,
-                    #                 ),
-                    #             ]
-                    #         )
-                    #     ],
-                    #     style={'height': '0px'},
-                    # ),
                     html.Img(
                         id='graph-image',
-                        # src=dash.get_asset_url('network_graph.png'),
                         src=None,
                         alt='image',
                         className='twelve columns',

@@ -61,8 +61,8 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
         if 'communities' in options:
             analyzer.detect_communities()
 
-        # analyzer.calculate_centralities()
-        # analyzer.save_results()
+        analyzer.calculate_centralities()
+        analyzer.save_results()
 
         if not ('historical' in options and os.path.exists(f'assets/{image_filename}')):
             analyzer.visualize(
