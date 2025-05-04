@@ -5,7 +5,7 @@ import dash.dependencies as dd
 import pandas as pd
 
 from layout import layout
-from data_extraction import simple_import, get_user_data, fast_get_friends
+from data_extraction import simple_export, simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
@@ -44,7 +44,11 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
             break
 
-        friends, relations = simple_import(input_value)
+        if 'historical' in options and os.path.exists(f'dumps/users_relations_{input_value}.txt'):
+            friends, relations = simple_import(input_value)
+        else:
+            friends, relations = fast_get_friends(input_value)
+            simple_export(input_value, friends, relations)
 
         if not relations:
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
