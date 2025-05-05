@@ -330,7 +330,7 @@ def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
         if line.startswith('('):
             relations.add(tuple(map(int, line[1:-2].split(', '))))
         else:
-            data = line.split(' ')
+            data = line[:-1].split(' ')
             users.add(User(
                 int(data[0]),
                 data[1],
