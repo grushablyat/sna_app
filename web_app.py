@@ -55,18 +55,12 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
-        friends_filename = f'friends_list_{input_value}.csv'
-
         image_filename = lambda l, c: f'assets/graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
 
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
 
-        if not ('historical' in options and os.path.exists(f'tables/{friends_filename}')):
-            analyzer.save_friends_list(output_file=f'tables/{friends_filename}')
-
         analyzer.calculate_centralities()
-        analyzer.save_results()
 
         for labels in (False, True):
             analyzer.visualize(
@@ -84,6 +78,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
                 communities=True,
             )
 
+        analyzer.save_results(input_value)
         break
 
     return [v for k, v in result.items()]
@@ -117,9 +112,29 @@ def apply_graph_options_button_clicked(n_clicks, input_value, options):
 )
 def switch_table_tab(current_tab, input_value):
     if current_tab == 'tab-1-friends-table':
-        return dash.dash_table.DataTable(pd.read_csv(f'tables/friends_list_{input_value}.csv').to_dict('records'))
-    if current_tab == 'tab-2-metrics-table':
-        return dash.dash_table.DataTable(pd.read_csv('test_metrics.csv').to_dict('records'))
+        return dash.dash_table.DataTable(pd.read_csv(
+            f'tables/metrics_{input_value}.csv',
+            usecols=['ID', 'Имя', 'Фамилия']
+        ).sort_values('ID', ascending=True).to_dict('records'))
+
+    if current_tab == 'tab-2-betweenness-table':
+        return dash.dash_table.DataTable(pd.read_csv(
+            f'tables/metrics_{input_value}.csv',
+            usecols=['ID', 'Имя', 'Фамилия', 'Посредническая центральность']
+        ).sort_values('Посредническая центральность', ascending=False).to_dict('records'))
+
+    if current_tab == 'tab-3-eigenvector-table':
+        return dash.dash_table.DataTable(pd.read_csv(
+            f'tables/metrics_{input_value}.csv',
+            usecols=['ID', 'Имя', 'Фамилия', 'Степень влиятельности']
+        ).sort_values('Степень влиятельности', ascending=False).to_dict('records'))
+    if current_tab == 'tab-4-pagerank-table':
+
+        return dash.dash_table.DataTable(pd.read_csv(
+            f'tables/metrics_{input_value}.csv',
+            usecols=['ID', 'Имя', 'Фамилия', 'PageRank']
+        ).sort_values('PageRank', ascending=False).to_dict('records'))
+
     return dash.dash_table.DataTable(None)
 
 

@@ -109,20 +109,24 @@ class SocialNetworkAnalyzer:
         self.modularity_score = modularity(self.graph, self.communities)
         print(f"Сообщества обнаружены: {len(self.communities)} сообществ, модулярность = {self.modularity_score:.3f}")
 
-    def save_results(self, output_file='network_metrics.csv'):
+    def save_results(self, id=0):
         """Сохранение результатов в CSV."""
         if not self.graph.nodes:
             print("Ошибка: граф пуст")
             return
 
+        output_file = f'tables/metrics_{id}.csv'
+
         results = {
-            'UserID': list(self.graph.nodes()),
+            'ID': list(self.graph.nodes()),
+            'Имя': [user.first_name for user in self.users],
+            'Фамилия': [user.last_name for user in self.users],
         }
 
         if self.betweenness:
-            results['Betweenness'] = [self.betweenness.get(node, 0) for node in self.graph.nodes()]
+            results['Посредническая центральность'] = [self.betweenness.get(node, 0) for node in self.graph.nodes()]
         if self.eigenvector:
-            results['Eigenvector'] = [self.eigenvector.get(node, 0) for node in self.graph.nodes()]
+            results['Степень влиятельности'] = [self.eigenvector.get(node, 0) for node in self.graph.nodes()]
         if self.pagerank:
             results['PageRank'] = [self.pagerank.get(node, 0) for node in self.graph.nodes()]
         if self.communities and self.partition:
@@ -137,12 +141,8 @@ class SocialNetworkAnalyzer:
             return
 
         self.results = pd.DataFrame(results)
-
-        self.results = self.results.sort_values(by='Betweenness', ascending=False)
+        self.results = self.results.sort_values(by='ID', ascending=True)
         self.results.to_csv(output_file, index=False)
-        print(f"Результаты сохранены в '{output_file}'")
-        print("\nТоп-5 узлов по междуности:")
-        print(self.results.head())
 
     def visualize(self, output_file='network_graph.png', labels=True, communities=True):
         """Визуализация графа: цвет по сообществам (если есть), размер по междуности."""

@@ -131,8 +131,16 @@ layout = html.Div([
                                 label='Друзья',
                             ),
                             dcc.Tab(
-                                value='tab-2-metrics-table',
-                                label='Метрики',
+                                value='tab-2-betweenness-table',
+                                label='Посредническая центральность',
+                            ),
+                            dcc.Tab(
+                                value='tab-3-eigenvector-table',
+                                label='Степень влиятельности',
+                            ),
+                            dcc.Tab(
+                                value='tab-4-pagerank-table',
+                                label='PageRank',
                             ),
                         ],
                     ),
