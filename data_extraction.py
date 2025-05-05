@@ -35,6 +35,7 @@ def get_user_data(id: int) -> User:
         'user_ids': id,
         'fields': 'bdate',
         'access_token': ACCESS_TOKEN,
+        'lang': 'ru',
         'v': '5.199',
     }
 
