@@ -302,7 +302,7 @@ def import_from_json(id: int, add_fr_friends: bool=False, add_fr_fr_cons: bool=F
 # Простой экспорт в TXT готовых объектов пользователей и отношений
 def simple_export(id: int, users: Collection[User], relations: Collection[tuple], filename: str=None) -> None:
     if not filename:
-        filename = f'users_relations_{id}.txt'
+        filename = f'dump_{id}.txt'
 
     filename = 'dumps/' + filename
 
@@ -318,7 +318,7 @@ def simple_export(id: int, users: Collection[User], relations: Collection[tuple]
 # Простой импорт из TXT готовых объектов пользователей и отношений
 def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
     if not filename:
-        filename = f'users_relations_{id}.txt'
+        filename = f'dump_{id}.txt'
 
     filename = 'dumps/' + filename
 

@@ -45,7 +45,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
             break
 
-        if 'historical' in options and os.path.exists(f'dumps/users_relations_{input_value}.txt'):
+        if 'historical' in options and os.path.exists(f'dumps/dump_{input_value}.txt'):
             friends, relations = simple_import(input_value)
         else:
             friends, relations = fast_get_friends(input_value)
