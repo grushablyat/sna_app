@@ -42,7 +42,7 @@ layout = html.Div([
                             dcc.Checklist(
                                 id='historical-checklist',
                                 options={
-                                    'historical': 'Использовать исторические данные (при наличии)',
+                                    'historical': 'Импортировать данные (при наличии)',
                                 },
                                 value=['historical'],
                             ),
@@ -75,7 +75,7 @@ layout = html.Div([
                                     'labels': 'Подписи узлов графа (ID пользователей)',
                                     'communities': 'Выделение обнаруженных сообществ',
                                 },
-                                value=['labels', 'communities'],
+                                value=[],
                             ),
                             html.Button(
                                 'Обновить граф',
@@ -114,13 +114,6 @@ layout = html.Div([
                 id='tables-section',
                 className='four columns',
                 children=[
-                    html.Div(
-                        className='twelve columns',
-                        children=[
-                            html.H3('Таблицы друзей'),
-                        ],
-                        style={'textAlign': 'center'},
-                    ),
                     dcc.Tabs(
                         id='tables-tabs',
                         className='twelve columns',
