@@ -5,7 +5,7 @@ import dash.dependencies as dd
 import pandas as pd
 
 from layout import layout
-from data_extraction import simple_export, simple_import, get_user_data, fast_get_friends
+from vk_data_extractor import simple_export, simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
