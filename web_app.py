@@ -113,6 +113,9 @@ def apply_graph_options_button_clicked(n_clicks, input_value, options):
     prevent_initial_call=True,
 )
 def switch_table_tab(current_tab, input_value):
+    if not os.path.exists(f'{TABLES}/metrics_{input_value}.csv'):
+        return dash.dash_table.DataTable(None)
+
     if current_tab == 'tab-1-friends-table':
         return dash.dash_table.DataTable(pd.read_csv(
             f'{TABLES}/metrics_{input_value}.csv',
