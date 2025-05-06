@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from config import ACCESS_TOKEN
+from config import ACCESS_TOKEN, DUMPS
 from user import User
 
 
@@ -304,7 +304,7 @@ def simple_export(id: int, users: Collection[User], relations: Collection[tuple]
     if not filename:
         filename = f'dump_{id}.txt'
 
-    filename = 'dumps/' + filename
+    filename = f'{DUMPS}/{filename}'
 
     file = codecs.open(filename, 'w', encoding='utf-8')
     for user in users:
@@ -320,7 +320,7 @@ def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
     if not filename:
         filename = f'dump_{id}.txt'
 
-    filename = 'dumps/' + filename
+    filename = f'{DUMPS}/{filename}'
 
     users = set()
     relations = set()

@@ -109,13 +109,11 @@ class SocialNetworkAnalyzer:
         self.modularity_score = modularity(self.graph, self.communities)
         print(f"Сообщества обнаружены: {len(self.communities)} сообществ, модулярность = {self.modularity_score:.3f}")
 
-    def save_results(self, id=0):
+    def save_results(self, metrics_filename='network_metrics.csv'):
         """Сохранение результатов в CSV."""
         if not self.graph.nodes:
             print("Ошибка: граф пуст")
             return
-
-        output_file = f'tables/metrics_{id}.csv'
 
         results = {
             'ID': list(self.graph.nodes()),
@@ -142,7 +140,7 @@ class SocialNetworkAnalyzer:
 
         self.results = pd.DataFrame(results)
         self.results = self.results.sort_values(by='ID', ascending=True)
-        self.results.to_csv(output_file, index=False)
+        self.results.to_csv(metrics_filename, index=False)
 
     def visualize(self, output_file='network_graph.png', labels=True, communities=True):
         """Визуализация графа: цвет по сообществам (если есть), размер по междуности."""

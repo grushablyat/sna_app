@@ -4,16 +4,17 @@ import dash
 import dash.dependencies as dd
 import pandas as pd
 
+from config import ASSETS, TABLES
 from layout import layout
 from vk_data_extractor import simple_export, simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
-app = dash.Dash(__name__)
+app = dash.Dash(
+    __name__,
+    assets_folder=ASSETS,
+)
 app.title = 'Анализ дружеских связей пользователя ВК'
-
-TARGET_USER_ID = None
-
 app.layout = layout
 
 
@@ -55,7 +56,8 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
-        image_filename = lambda l, c: f'assets/graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
+        image_filename = lambda l, c: f'{ASSETS}/graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
+        metrics_filename = f'{TABLES}/metrics_{input_value}.csv'
 
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
@@ -78,7 +80,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
                 communities=True,
             )
 
-        analyzer.save_results(input_value)
+        analyzer.save_results(metrics_filename)
         break
 
     return [v for k, v in result.items()]
@@ -98,7 +100,7 @@ def apply_graph_options_button_clicked(n_clicks, input_value, options):
                 f'{"l" if "labels" in options else "n"}_'
                 f'{"c" if "communities" in options else "n"}.png')
 
-    if os.path.exists(f'assets/{image_filename}'):
+    if os.path.exists(f'{ASSETS}/{image_filename}'):
         return dash.get_asset_url(image_filename)
     else:
         return None
@@ -113,25 +115,25 @@ def apply_graph_options_button_clicked(n_clicks, input_value, options):
 def switch_table_tab(current_tab, input_value):
     if current_tab == 'tab-1-friends-table':
         return dash.dash_table.DataTable(pd.read_csv(
-            f'tables/metrics_{input_value}.csv',
+            f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия']
         ).sort_values('ID', ascending=True).to_dict('records'))
 
     if current_tab == 'tab-2-betweenness-table':
         return dash.dash_table.DataTable(pd.read_csv(
-            f'tables/metrics_{input_value}.csv',
+            f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия', 'Посредническая центральность']
         ).sort_values('Посредническая центральность', ascending=False).to_dict('records'))
 
     if current_tab == 'tab-3-eigenvector-table':
         return dash.dash_table.DataTable(pd.read_csv(
-            f'tables/metrics_{input_value}.csv',
+            f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия', 'Степень влиятельности']
         ).sort_values('Степень влиятельности', ascending=False).to_dict('records'))
     if current_tab == 'tab-4-pagerank-table':
 
         return dash.dash_table.DataTable(pd.read_csv(
-            f'tables/metrics_{input_value}.csv',
+            f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия', 'PageRank']
         ).sort_values('PageRank', ascending=False).to_dict('records'))
 
