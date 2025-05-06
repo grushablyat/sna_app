@@ -128,7 +128,7 @@ class SocialNetworkAnalyzer:
         if self.pagerank:
             results['PageRank'] = [self.pagerank.get(node, 0) for node in self.graph.nodes()]
         if self.communities and self.partition:
-            results['Communities'] = [self.partition.get(node, -1) for node in self.graph.nodes()]
+            results['Сообщества'] = [self.partition.get(node, -1) for node in self.graph.nodes()]
 
         if not self.betweenness \
             and not self.eigenvector \

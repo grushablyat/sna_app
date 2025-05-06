@@ -133,12 +133,18 @@ def switch_table_tab(current_tab, input_value):
             f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия', 'Степень влиятельности']
         ).sort_values('Степень влиятельности', ascending=False).to_dict('records'))
-    if current_tab == 'tab-4-pagerank-table':
 
+    if current_tab == 'tab-4-pagerank-table':
         return dash.dash_table.DataTable(pd.read_csv(
             f'{TABLES}/metrics_{input_value}.csv',
             usecols=['ID', 'Имя', 'Фамилия', 'PageRank']
         ).sort_values('PageRank', ascending=False).to_dict('records'))
+
+    if current_tab == 'tab-5-communities-table':
+        return dash.dash_table.DataTable(pd.read_csv(
+            f'{TABLES}/metrics_{input_value}.csv',
+            usecols=['ID', 'Имя', 'Фамилия', 'Сообщества']
+        ).sort_values('Сообщества', ascending=False).to_dict('records'))
 
     return dash.dash_table.DataTable(None)
 

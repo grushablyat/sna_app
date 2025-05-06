@@ -135,6 +135,10 @@ layout = html.Div([
                                 value='tab-4-pagerank-table',
                                 label='PageRank',
                             ),
+                            dcc.Tab(
+                                value='tab-5-communities-table',
+                                label='Сообщества',
+                            ),
                         ],
                     ),
                     html.Div(
