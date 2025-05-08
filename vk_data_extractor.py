@@ -46,7 +46,7 @@ def get_user_data(id: int) -> User:
 
     try:
         user_data = dict_user['response'][0]
-        user = User(user_data['id'], user_data['first_name'], user_data['last_name'])
+        user = User(user_data['id'], user_data['first_name'], user_data['last_name'], user_data['is_closed'])
     except KeyError as e:
         pass
     finally:
@@ -129,7 +129,8 @@ def json_to_objects(str_friends: str) -> (set[User], set[tuple]):
                 friends.add(User(
                     friend['id'],
                     friend['first_name'],
-                    friend['last_name']
+                    friend['last_name'],
+                    friend['is_closed'],
                 ))
                 relations.add((min(user_id, friend['id']), max(user_id, friend['id'])))
     except KeyError as e:
@@ -175,12 +176,17 @@ def fast_get_friends(id: int) -> (set[User], set[tuple]):
     str_frs = fast_extract_fr_friends_json([id])[0]
     friends, relations = json_to_objects(str_frs)
 
+    opened_users_ids = set()
+    for friend in friends:
+        if not friend.is_closed:
+            opened_users_ids.add(friend.id)
+
     user = get_user_data(id)
     friends.add(user)
 
     users_ids = set([friend.id for friend in friends])
 
-    str_frs_frs = fast_extract_fr_friends_json(list(users_ids - {id}))
+    str_frs_frs = fast_extract_fr_friends_json(list(opened_users_ids))
 
     for str_fr_frs in str_frs_frs:
         fr_friends, fr_relations = json_to_objects(str_fr_frs)
@@ -335,7 +341,10 @@ def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
                 int(data[0]),
                 data[1],
                 data[2],
+                bool(data[3]),
             ))
+
+    file.close()
 
     return users, relations
 
