@@ -116,37 +116,26 @@ def switch_table_tab(current_tab, input_value):
     if not os.path.exists(f'{TABLES}/metrics_{input_value}.csv'):
         return dash.dash_table.DataTable(None)
 
+    metric = None
+
     if current_tab == 'tab-1-friends-table':
-        return dash.dash_table.DataTable(pd.read_csv(
-            f'{TABLES}/metrics_{input_value}.csv',
-            usecols=['ID', 'Имя', 'Фамилия']
-        ).sort_values('ID', ascending=True).to_dict('records'))
+        pass
+    elif current_tab == 'tab-2-betweenness-table':
+        metric = 'Посредническая центральность'
+    elif current_tab == 'tab-3-eigenvector-table':
+        metric = 'Степень влиятельности'
+    elif current_tab == 'tab-4-pagerank-table':
+        metric = 'PageRank'
+    elif current_tab == 'tab-5-communities-table':
+        metric = 'Сообщества'
 
-    if current_tab == 'tab-2-betweenness-table':
-        return dash.dash_table.DataTable(pd.read_csv(
-            f'{TABLES}/metrics_{input_value}.csv',
-            usecols=['ID', 'Имя', 'Фамилия', 'Посредническая центральность']
-        ).sort_values('Посредническая центральность', ascending=False).to_dict('records'))
+    columns = ['ID', 'Имя', 'Фамилия']
+    columns.append(metric) if metric else None
 
-    if current_tab == 'tab-3-eigenvector-table':
-        return dash.dash_table.DataTable(pd.read_csv(
-            f'{TABLES}/metrics_{input_value}.csv',
-            usecols=['ID', 'Имя', 'Фамилия', 'Степень влиятельности']
-        ).sort_values('Степень влиятельности', ascending=False).to_dict('records'))
-
-    if current_tab == 'tab-4-pagerank-table':
-        return dash.dash_table.DataTable(pd.read_csv(
-            f'{TABLES}/metrics_{input_value}.csv',
-            usecols=['ID', 'Имя', 'Фамилия', 'PageRank']
-        ).sort_values('PageRank', ascending=False).to_dict('records'))
-
-    if current_tab == 'tab-5-communities-table':
-        return dash.dash_table.DataTable(pd.read_csv(
-            f'{TABLES}/metrics_{input_value}.csv',
-            usecols=['ID', 'Имя', 'Фамилия', 'Сообщества']
-        ).sort_values('Сообщества', ascending=False).to_dict('records'))
-
-    return dash.dash_table.DataTable(None)
+    return dash.dash_table.DataTable(pd.read_csv(
+        f'{TABLES}/metrics_{input_value}.csv',
+        usecols=columns,
+    ).sort_values(metric if metric else 'ID', ascending=False if metric else True).to_dict('records'), page_size=20)
 
 
 if __name__ == '__main__':

@@ -146,7 +146,6 @@ layout = html.Div([
                         className='twelve columns',
                         style={
                             'height': '70vh',
-                            'overflow': 'scroll',
                         }
                     ),
                 ],
