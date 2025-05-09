@@ -4,6 +4,36 @@ from dash import dcc
 from dash import html
 
 
+tabs_style = {
+    'width' : '100%',
+    'display' : 'flex',
+    'flexWrap' : 'wrap',
+    'justifyContent' : 'flex-start',
+}
+
+tab_style_1 = {
+    'borderTop' : '1px solid #cccccc',
+    'borderBottom' : '1px solid #cccccc',
+    'backgroundColor' : '#FFFFFF',
+    'padding' : '8px',
+    'textAlign' : 'center',
+    'flex' : '1 1 33%',
+    'flexBasis': '33%',
+    'flexGrow': 0,
+}
+
+tab_style_sel_1 = tab_style_1.copy()
+tab_style_sel_1['backgroundColor'] = '#F0F2F4'
+
+tab_style_2 = tab_style_1.copy()
+tab_style_2['flex'] = '1 1 50%'
+tab_style_2['flexBasis'] = '50%'
+
+tab_style_sel_2 = tab_style_2.copy()
+tab_style_sel_2['background-color'] = '#F0F2F4'
+
+
+
 layout = html.Div([
     ###################################### Заголовок ######################################
     html.Div(
@@ -122,24 +152,35 @@ layout = html.Div([
                             dcc.Tab(
                                 value='tab-1-friends-table',
                                 label='Друзья',
-                            ),
-                            dcc.Tab(
-                                value='tab-2-betweenness-table',
-                                label='Посредническая центральность',
-                            ),
-                            dcc.Tab(
-                                value='tab-3-eigenvector-table',
-                                label='Степень влиятельности',
-                            ),
-                            dcc.Tab(
-                                value='tab-4-pagerank-table',
-                                label='PageRank',
+                                style=tab_style_1,
+                                selected_style=tab_style_sel_1,
                             ),
                             dcc.Tab(
                                 value='tab-5-communities-table',
                                 label='Сообщества',
+                                style=tab_style_1,
+                                selected_style=tab_style_sel_1,
+                            ),
+                            dcc.Tab(
+                                value='tab-4-pagerank-table',
+                                label='PageRank',
+                                style=tab_style_1,
+                                selected_style=tab_style_sel_1,
+                            ),
+                            dcc.Tab(
+                                value='tab-2-betweenness-table',
+                                label='Посредническая центральность',
+                                style=tab_style_2,
+                                selected_style=tab_style_sel_2,
+                            ),
+                            dcc.Tab(
+                                value='tab-3-eigenvector-table',
+                                label='Степень влиятельности',
+                                style=tab_style_2,
+                                selected_style=tab_style_sel_2,
                             ),
                         ],
+                        style=tabs_style,
                     ),
                     html.Div(
                         id='table-place',
