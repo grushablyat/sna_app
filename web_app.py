@@ -101,6 +101,21 @@ def switch_table_tab(current_tab, input_value):
     ).sort_values(metric if metric else 'ID', ascending=False if metric else True).to_dict('records'), page_size=20)
 
 
+@app.callback(
+    dd.Output('user-data-by-click', 'children'),
+    dd.Input('interactive-graph', 'clickData'),
+    dd.State('access-token-input', 'value'),
+    prevent_initial_call=True,
+)
+def node_clicked(clickData, access_token):
+    print(clickData)
+
+    user_id = clickData['points'][0]['text']
+    user = get_user_data(user_id, access_token)
+
+    return user.__str__()
+
+
 if __name__ == '__main__':
     pass
     app.run(debug=True, host='0.0.0.0', port=8050)

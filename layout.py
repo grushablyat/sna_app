@@ -98,9 +98,19 @@ layout = html.Div([
                         ],
                         style={'height': '300px'},
                     ),
-                    ###################################### Options section ######################################
+                    ###################################### User data section ######################################
                     html.Div(
-                        children='Здесь будет информация о пользователях по клику',
+                        id='user-data-section',
+                        className='twelve columns',
+                        children=[
+                            dcc.Markdown(d('''
+                            **Click Data**
+                            
+                            Click on points on the graph
+                            ''')),
+                            html.Pre(id='user-data-by-click'),
+                        ],
+                        style={'height': '300px'},
                     ),
                 ],
             ),
