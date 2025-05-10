@@ -4,16 +4,13 @@ import dash
 import dash.dependencies as dd
 import pandas as pd
 
-from config import ASSETS, TABLES
+from config import TABLES
 from layout import layout
 from vk_data_extractor import simple_export, simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
 
-app = dash.Dash(
-    __name__,
-    assets_folder=ASSETS,
-)
+app = dash.Dash(__name__)
 app.title = 'Анализ дружеских связей пользователя ВК'
 app.layout = layout
 
