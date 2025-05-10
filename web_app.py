@@ -23,7 +23,7 @@ app.layout = layout
     [
         dd.Output('target-user-id-error', 'children'),
         dd.Output('tables-tabs', 'value'),
-        dd.Output('apply-graph-options-button', 'n_clicks')
+        dd.Output('interactive-graph', 'figure'),
     ],
     dd.Input('target-user-id-button', 'n_clicks'),
     [
@@ -36,7 +36,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
     result = {
         'target-user-id-error': '',
         'tables-tabs': 'tab-1-friends-table',
-        'apply-graph-options-button': -1,
+        'interactive-graph': None,
     }
 
     for _ in [0]:
@@ -56,54 +56,19 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
-        image_filename = lambda l, c: f'{ASSETS}/graph_image_{input_value}_{"l" if l else "n"}_{"c" if c else "n"}.png'
         metrics_filename = f'{TABLES}/metrics_{input_value}.csv'
 
         analyzer = SocialNetworkAnalyzer()
-        analyzer.load_from_edges(nodes=[friend.id for friend in friends], edges=relations, users=friends)
+        analyzer.load_from_edges(friends, relations)
 
         analyzer.calculate_centralities()
-
-        for labels in (False, True):
-            analyzer.visualize(
-                image_filename(labels, False),
-                labels=labels,
-                communities=False,
-            )
-
         analyzer.detect_communities()
-
-        for labels in (False, True):
-            analyzer.visualize(
-                image_filename(labels, True),
-                labels=labels,
-                communities=True,
-            )
-
         analyzer.save_results(metrics_filename)
+
+        result['interactive-graph'] = analyzer.create_interactive_graph(input_value)
         break
 
     return [v for k, v in result.items()]
-
-
-# Show graph image with options by pushing apply button
-@app.callback(
-    dd.Output('graph-image', 'src'),
-    dd.Input('apply-graph-options-button', 'n_clicks'),
-    [
-        dd.State('target-user-id-input', 'value'),
-        dd.State('options-checklist', 'value'),
-    ]
-)
-def apply_graph_options_button_clicked(n_clicks, input_value, options):
-    image_filename = (f'graph_image_{input_value}_'
-                f'{"l" if "labels" in options else "n"}_'
-                f'{"c" if "communities" in options else "n"}.png')
-
-    if os.path.exists(f'{ASSETS}/{image_filename}'):
-        return dash.get_asset_url(image_filename)
-    else:
-        return None
 
 
 @app.callback(
@@ -129,7 +94,7 @@ def switch_table_tab(current_tab, input_value):
     elif current_tab == 'tab-5-communities-table':
         metric = 'Сообщества'
 
-    columns = ['ID', 'Имя', 'Фамилия']
+    columns = ['ID', 'Имя']
     columns.append(metric) if metric else None
 
     return dash.dash_table.DataTable(pd.read_csv(
@@ -140,4 +105,4 @@ def switch_table_tab(current_tab, input_value):
 
 if __name__ == '__main__':
     pass
-    app.run(debug=True, host='0.0.0.0', port=8051)
+    app.run(debug=True, host='0.0.0.0', port=8050)

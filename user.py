@@ -8,6 +8,13 @@ class User:
     def __str__(self):
         return f'{self.id} {self.first_name} {self.last_name} {self.is_closed}'
 
+    def to_dict(self):
+        return {
+            'N': self.id,
+            'ID': self.id,
+            'Name': f'{self.first_name} {self.last_name}',
+        }
+
     def __eq__(self, other):
         return isinstance(other, User) and self.__dict__ == other.__dict__
 

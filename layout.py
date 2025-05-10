@@ -91,30 +91,7 @@ layout = html.Div([
                     ),
                     ###################################### Options section ######################################
                     html.Div(
-                        id='options-section',
-                        className='twelve columns',
-                        children=[
-                            dcc.Markdown(d('''
-                            **Опции**
-                            
-                            Выберите необходимые опции:
-                            ''')),
-                            dcc.Checklist(
-                                id='options-checklist',
-                                options={
-                                    'labels': 'Подписи узлов графа (ID пользователей)',
-                                    'communities': 'Выделение обнаруженных сообществ',
-                                },
-                                value=[],
-                            ),
-                            html.Button(
-                                'Обновить граф',
-                                id='apply-graph-options-button',
-                                className='twelve columns',
-                                n_clicks=0,
-                            )
-                        ],
-                        style={'height': '300px'},
+                        children='Здесь будет информация о пользователях по клику',
                     ),
                 ],
             ),
@@ -130,11 +107,9 @@ layout = html.Div([
                         ],
                         style={'textAlign': 'center'},
                     ),
-                    html.Img(
-                        id='graph-image',
-                        src=None,
-                        alt='image',
-                        className='twelve columns',
+                    dcc.Graph(
+                        id='interactive-graph',
+                        figure=None,
                     ),
                 ],
             ),
