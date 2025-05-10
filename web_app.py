@@ -26,10 +26,11 @@ app.layout = layout
     [
         dd.State('target-user-id-input', 'value'),
         dd.State('historical-checklist', 'value'),
+        dd.State('access-token-input', 'value'),
     ],
     prevent_initial_call=True,
 )
-def target_user_id_button_clicked(n_clicks, input_value, options):
+def target_user_id_button_clicked(n_clicks, input_value, options, access_token):
     result = {
         'target-user-id-error': '',
         'tables-tabs': 'tab-1-friends-table',
@@ -37,7 +38,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
     }
 
     for _ in [0]:
-        user = get_user_data(input_value)
+        user = get_user_data(input_value, access_token)
 
         if not user:
             result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
@@ -46,7 +47,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options):
         if 'historical' in options and os.path.exists(f'dumps/dump_{input_value}.txt'):
             friends, relations = simple_import(input_value)
         else:
-            friends, relations = fast_get_friends(input_value)
+            friends, relations = fast_get_friends(input_value, access_token)
             simple_export(input_value, friends, relations)
 
         if not relations:

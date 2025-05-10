@@ -69,6 +69,15 @@ layout = html.Div([
                                 placeholder='Введите ID',
                                 className='twelve columns',
                             ),
+                            dcc.Markdown(d('''
+                            Укажите ключ доступа:
+                            ''')),
+                            dcc.Input(
+                                id='access-token-input',
+                                type='password',
+                                placeholder='Вставьте ключ доступа',
+                                className='twelve columns',
+                            ),
                             dcc.Checklist(
                                 id='historical-checklist',
                                 options={

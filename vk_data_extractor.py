@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from config import ACCESS_TOKEN, DUMPS
+from config import DUMPS
 from user import User
 
 
@@ -29,12 +29,12 @@ def send_request(url: str, fields: dict) -> str:
 
 
 # Получение данных пользователя
-def get_user_data(id: int) -> User:
+def get_user_data(id: int, token: str) -> User:
     url = 'https://api.vk.com/method/users.get'
     fields = {
         'user_ids': id,
         'fields': 'bdate',
-        'access_token': ACCESS_TOKEN,
+        'access_token': token,
         'lang': 'ru',
         'v': '5.199',
     }
@@ -54,14 +54,14 @@ def get_user_data(id: int) -> User:
 
 
 # Извлечение данных о списке друзей в формате JSON
-def extract_friends_json(id: int) -> (str, dict):
+def extract_friends_json(id: int, token: str) -> (str, dict):
     url = f'https://api.vk.com/method/friends.get'
     fields = {
         'user_id': id,
         'order': 'hints',
         # 'count': 20,
         'fields': 'bdate',
-        'access_token': ACCESS_TOKEN,
+        'access_token': token,
         'lang': 'ru',
         'v': '5.199',
     }
@@ -75,11 +75,11 @@ def extract_friends_json(id: int) -> (str, dict):
 
 # Ускоренное извлечение данных о списке друзей в формате JSON
 # Используется метод execute для выполнения множества обращений в рамках одного запроса
-def fast_extract_fr_friends_json(ids: list[int]) -> list[str]:
+def fast_extract_fr_friends_json(ids: list[int], token: str) -> list[str]:
     url = 'https://api.vk.com/method/execute'
     fields = {
         'code': '',
-        'access_token': ACCESS_TOKEN,
+        'access_token': token,
         'lang': 'ru',
         'v': '5.199',
     }
@@ -172,8 +172,8 @@ def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], 
 
 
 # Ускоренное получение списка друзей с отношениями
-def fast_get_friends(id: int) -> (set[User], set[tuple]):
-    str_frs = fast_extract_fr_friends_json([id])[0]
+def fast_get_friends(id: int, token: str) -> (set[User], set[tuple]):
+    str_frs = fast_extract_fr_friends_json([id], token)[0]
     friends, relations = json_to_objects(str_frs)
 
     opened_users_ids = set()
@@ -181,12 +181,12 @@ def fast_get_friends(id: int) -> (set[User], set[tuple]):
         if not friend.is_closed:
             opened_users_ids.add(friend.id)
 
-    user = get_user_data(id)
+    user = get_user_data(id, token)
     friends.add(user)
 
     users_ids = set([friend.id for friend in friends])
 
-    str_frs_frs = fast_extract_fr_friends_json(list(opened_users_ids))
+    str_frs_frs = fast_extract_fr_friends_json(list(opened_users_ids), token)
 
     for str_fr_frs in str_frs_frs:
         fr_friends, fr_relations = json_to_objects(str_fr_frs)
@@ -198,16 +198,16 @@ def fast_get_friends(id: int) -> (set[User], set[tuple]):
 
 
 # Ускоренное получение списка друзей и их друзей с отношениями
-def fast_get_friends_and_friends(id: int) -> (set[User], set[tuple]):
-    str_frs = fast_extract_fr_friends_json([id])[0]
+def fast_get_friends_and_friends(id: int, token: str) -> (set[User], set[tuple]):
+    str_frs = fast_extract_fr_friends_json([id], token)[0]
     friends, relations = json_to_objects(str_frs)
 
-    user = get_user_data(id)
+    user = get_user_data(id, token)
     friends.add(user)
 
     users_ids = set([friend.id for friend in friends])
 
-    str_frs_frs = fast_extract_fr_friends_json(list(users_ids - {id}))
+    str_frs_frs = fast_extract_fr_friends_json(list(users_ids - {id}), token)
 
     for str_fr_frs in str_frs_frs:
         fr_friends, fr_relations = json_to_objects(str_fr_frs)
@@ -217,7 +217,7 @@ def fast_get_friends_and_friends(id: int) -> (set[User], set[tuple]):
         users_ids.update(fr_frs_ids)
         relations.update(fr_relations)
 
-        str_fr_frs_frs = fast_extract_fr_friends_json(fr_frs_ids)
+        str_fr_frs_frs = fast_extract_fr_friends_json(fr_frs_ids, token)
         for str_fr_fr_frs in str_fr_frs_frs:
             fr_fr_friends, fr_fr_relations = json_to_objects(str_fr_fr_frs)
 
