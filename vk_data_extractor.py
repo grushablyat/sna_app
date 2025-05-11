@@ -8,9 +8,10 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from config import DUMPS
 from user import User
 
+
+DUMPS = 'dumps'
 
 TIMING = 0.21
 SIMULTANEOUS_APPEALS = 25

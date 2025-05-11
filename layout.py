@@ -79,11 +79,11 @@ layout = html.Div([
                                 className='twelve columns',
                             ),
                             dcc.Checklist(
-                                id='historical-checklist',
+                                id='import-checklist',
                                 options={
-                                    'historical': 'Импортировать данные (при наличии)',
+                                    'import': 'Импортировать данные (при наличии)',
                                 },
-                                value=['historical'],
+                                value=['import'],
                             ),
                             html.Button(
                                 'Начать анализ',

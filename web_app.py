@@ -4,11 +4,12 @@ import dash
 import dash.dependencies as dd
 import pandas as pd
 
-from config import TABLES
 from layout import layout
-from vk_data_extractor import simple_export, simple_import, get_user_data, fast_get_friends
+from vk_data_extractor import DUMPS, simple_export, simple_import, get_user_data, fast_get_friends
 from social_network_analyzer import SocialNetworkAnalyzer
 
+
+TABLES = 'tables'
 
 app = dash.Dash(__name__)
 app.title = 'Анализ дружеских связей пользователя ВК'
@@ -25,7 +26,7 @@ app.layout = layout
     dd.Input('target-user-id-button', 'n_clicks'),
     [
         dd.State('target-user-id-input', 'value'),
-        dd.State('historical-checklist', 'value'),
+        dd.State('import-checklist', 'value'),
         dd.State('access-token-input', 'value'),
     ],
     prevent_initial_call=True,
@@ -44,7 +45,7 @@ def target_user_id_button_clicked(n_clicks, input_value, options, access_token):
             result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
             break
 
-        if 'historical' in options and os.path.exists(f'dumps/dump_{input_value}.txt'):
+        if 'import' in options and os.path.exists(f'{DUMPS}/dump_{input_value}.txt'):
             friends, relations = simple_import(input_value)
         else:
             friends, relations = fast_get_friends(input_value, access_token)
