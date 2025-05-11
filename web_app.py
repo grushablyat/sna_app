@@ -102,19 +102,31 @@ def switch_table_tab(current_tab, input_value):
 
 
 @app.callback(
-    dd.Output('user-data-by-click', 'children'),
+    [
+        dd.Output('user-data-by-click', 'children'),
+        dd.Output('user-link-by-click', 'children'),
+        dd.Output('user-link-by-click', 'href')
+    ],
     dd.Input('interactive-graph', 'clickData'),
     dd.State('access-token-input', 'value'),
     prevent_initial_call=True,
 )
 def node_clicked(clickData, access_token):
+    result = {
+        'user-data-by-click': None,
+        'user_link_text': None,
+        'user_link_href': None,
+    }
+
     data = clickData['points'][0]
     type = data.get('text', None)
 
     if type:
         user_id = data.get('text')
         user = get_user_data(int(user_id), access_token, extended=True)
-        return user.info()
+
+        result['user-data-by-click'] = user.info()
+        result['user_link_text'] = result['user_link_href'] = f'https://vk.com/{user.domain}'
     else:
         text = data.get('hovertext')
         text = text.replace('<br>', ' ')
@@ -123,7 +135,10 @@ def node_clicked(clickData, access_token):
         user1 = get_user_data(text[1], access_token)
         user2 = get_user_data(text[3], access_token)
 
-        return f'Связь между:\n{user1.__str__()}\n{user2.__str__()}'
+        result['user-data-by-click'] = f'Связь между:\n{user1.__str__()}\n{user2.__str__()}'
+        result['user_link_text'] = result['user_link_href'] = None
+
+    return [v for k, v in result.items()]
 
 
 if __name__ == '__main__':

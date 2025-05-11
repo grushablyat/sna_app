@@ -96,7 +96,7 @@ layout = html.Div([
                                 style={'color': 'red'},
                             ),
                         ],
-                        style={'height': '370px'},
+                        style={'height': '340px'},
                     ),
                     ###################################### User data section ######################################
                     html.Div(
@@ -108,7 +108,20 @@ layout = html.Div([
                             
                             Нажмите на узел или ребро графа для отображения подробной информации
                             ''')),
-                            html.Pre(id='user-data-by-click'),
+                            html.A(
+                                id='user-link-by-click',
+                                href=None,
+                                children=None,
+                                target='_blank'
+                            ),
+                            html.Pre(
+                                id='user-data-by-click',
+                                style={
+                                    'font-family': 'Tahoma, Verdana, sans-serif',
+                                    'text-size': '16px',
+                                    'line-height': '18px',
+                                },
+                            ),
                         ],
                         style={'height': '300px'},
                     ),
