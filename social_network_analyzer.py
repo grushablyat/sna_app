@@ -194,16 +194,16 @@ class SocialNetworkAnalyzer:
             traceRecode = [
                 go.Scatter(
                     x=[0], y=[0], text=[str(target_user_id)], textposition='bottom center',
-                    mode='markers+text', marker={'size': 50, 'color': 'LightSkyBlue'}
+                    mode='markers+text', marker={'size': 15, 'color': 'LightSkyBlue'}
                 ),
                 go.Scatter(
-                    x=[0], y=[0], mode='markers', marker={'size': 50, 'color': 'LightSkyBlue'}, opacity=0
+                    x=[0], y=[0], mode='markers', marker={'size': 15, 'color': 'LightSkyBlue'}, opacity=0
                 )
             ]
             return {
                 'data': traceRecode,
                 'layout': go.Layout(
-                    title='Интерактивная визуализация транзакций (Нет связей)',
+                    title='Ошибка: в графе нет связей',
                     showlegend=False,
                     margin={'b': 40, 'l': 40, 'r': 40, 't': 40},
                     xaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
@@ -288,17 +288,4 @@ class SocialNetworkAnalyzer:
 
 
 if __name__ == "__main__":
-    # Пример использования
-    analyzer = SocialNetworkAnalyzer()
-    nodes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    edges = [
-        (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (4, 5),
-        (5, 6), (5, 7), (6, 7), (6, 8), (7, 8), (8, 9)
-    ]
-    # Тест с сообществами
-    analyzer.analyze_and_visualize(nodes, edges)
-    # Тест без сообществ
-    analyzer2 = SocialNetworkAnalyzer()
-    analyzer2.load_from_edges(nodes, edges)
-    analyzer2.calculate_centralities()
-    analyzer2.visualize('graph_no_communities.png')
+    pass
