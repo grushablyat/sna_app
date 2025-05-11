@@ -34,14 +34,14 @@ class User:
 
         info += '\n'
         if self.relation:
-            info += f'\nСемейное положение: {self.relation.__str__()[2:-3]}'
+            info += f'\nСемейное положение: {self.relation.__str__()}'
         if self.relation_partner:
             info += f'\nПартнёр: {self.relation_partner.__str__()}'
 
         if self.career:
             info += '\n\nМеста работы:'
         for career in self.career:
-            info += f'\n    {career.__str__()}'
+            info += f'\n    {" ".join([str(item) for item in career if item])}'
 
         if self.universities:
             info += '\n\nУниверситеты:'
