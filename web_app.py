@@ -108,14 +108,24 @@ def switch_table_tab(current_tab, input_value):
     prevent_initial_call=True,
 )
 def node_clicked(clickData, access_token):
-    print(clickData)
+    data = clickData['points'][0]
+    type = data.get('text', None)
 
-    user_id = clickData['points'][0]['text']
-    user = get_user_data(user_id, access_token)
+    if type:
+        user_id = data.get('text')
+        user = get_user_data(int(user_id), access_token, extended=True)
+        return user.info()
+    else:
+        text = data.get('hovertext')
+        text = text.replace('<br>', ' ')
+        text = text.split(' ')
 
-    return user.__str__()
+        user1 = get_user_data(text[1], access_token)
+        user2 = get_user_data(text[3], access_token)
+
+        return f'Связь между:\n{user1.__str__()}\n{user2.__str__()}'
 
 
 if __name__ == '__main__':
     pass
-    app.run(debug=True, host='0.0.0.0', port=8050)
+    app.run(debug=False, host='0.0.0.0', port=8050)

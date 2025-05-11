@@ -29,11 +29,11 @@ def send_request(url: str, fields: dict) -> str:
 
 
 # Получение данных пользователя
-def get_user_data(id: int, token: str) -> User:
+def get_user_data(id: int, token: str, extended: bool=False) -> User:
     url = 'https://api.vk.com/method/users.get'
     fields = {
         'user_ids': id,
-        'fields': 'bdate',
+        'fields': 'bdate' if not extended else 'about,bdate,career,city,domain,home_town,relation,relatives,schools,sex,status,universities',
         'access_token': token,
         'lang': 'ru',
         'v': '5.199',
@@ -45,8 +45,73 @@ def get_user_data(id: int, token: str) -> User:
     user = None
 
     try:
-        user_data = dict_user['response'][0]
-        user = User(user_data['id'], user_data['first_name'], user_data['last_name'], user_data['is_closed'])
+        data = dict_user['response'][0]
+
+        if extended:
+            fields = data.keys()
+            values = {}
+
+            values['about'] = data.get('about', None)
+            values['bdate'] = data.get('bdate', None)
+            values['career'] = [(
+                career.get('company', None),
+                career.get('group_id', None),
+                career.get('position', None),
+            ) for career in data.get('career', [])]
+
+            values['city'] = data.get('city').get('title', None) if data.get('city', None) else None
+            values['domain'] = data.get('domain', None)
+            values['home_town'] = data.get('home_town', None)
+
+            relations = {
+                1: 'не женат/не замужем',
+                2: 'есть друг/есть подруга',
+                3: 'помолвлен/помолвлена',
+                4: 'женат/замужем',
+                5: 'всё сложно',
+                6: 'в активном поиске',
+                7: 'влюблён/влюблена',
+                8: 'в гражданском браке',
+                0: 'не указано',
+            }
+            values['relation'] = relations.get(data.get('relation', 0), 'не указано')
+            values['relation_partner'] = User(
+                data.get('relation_partner').get('id', None),
+                data.get('relation_partner').get('first_name', None),
+                data.get('relation_partner').get('last_name', None),
+            ) if data.get('relation_partner', None) else None
+
+            relatives = {
+                'child': 'ребенок',
+                'sibling': 'брат/сестра',
+                'parent': 'родитель',
+                'grandparent': 'прародитель',
+                'grandchild': 'внук/внучка'
+            }
+            values['relatives'] = [(
+                relatives.get(relative.get('type', None), None),
+                get_user_data(relative.get('id'), token),
+            ) for relative in data.get('relatives', [])]
+
+            values['schools'] = [school.get('name', None) for school in data.get('schools', [])]
+
+            sexes = {
+                1: 'Женщина',
+                2: 'Мужчина',
+            }
+            values['sex'] = sexes.get(data.get('sex', None), None)
+            values['status'] = data.get('status', None)
+            values['universities'] = [university.get('name', None) for university in data.get('universities', [])]
+
+            user = User(
+                data['id'],
+                data['first_name'],
+                data['last_name'],
+                data['is_closed'],
+                kwargs=values,
+            )
+        else:
+            user = User(data['id'], data['first_name'], data['last_name'], data['is_closed'])
     except KeyError as e:
         pass
     finally:
