@@ -214,14 +214,13 @@ class SocialNetworkAnalyzer:
 
         traceRecode = []
 
-        edge_colors = ['rgb(128, 128, 128)' for _ in self.graph.edges()]
         for i, edge in enumerate(self.graph.edges()):
             x0, y0 = self.graph.nodes[edge[0]]['pos']
             x1, y1 = self.graph.nodes[edge[1]]['pos']
             trace = go.Scatter(
                 x=[x0, x1, None], y=[y0, y1, None],
-                mode='lines', line={'width': 1},
-                marker=dict(color=edge_colors[i]),
+                mode='lines', line={'width': 0.3},
+                marker=dict(color='rgb(80, 80, 80)'),
                 line_shape='spline', opacity=1
             )
             traceRecode.append(trace)
