@@ -37,15 +37,17 @@ def send_request(url: str, fields: dict) -> str:
 # Получение данных пользователя
 def get_user_data(id: int, token: str, extended: bool=False) -> User:
     url = 'https://api.vk.com/method/users.get'
-    fields = {
+    params = {
         'user_ids': id,
-        'fields': 'bdate' if not extended else 'about,bdate,career,city,domain,home_town,relation,relatives,schools,sex,status,universities',
         'access_token': token,
         'lang': 'ru',
         'v': '5.199',
     }
 
-    str_user = send_request(url, fields)
+    if extended:
+        params['fields'] = 'about,bdate,career,city,domain,home_town,relation,relatives,schools,sex,status,universities'
+
+    str_user = send_request(url, params)
     dict_user = json.loads(str_user)
 
     user = None
@@ -54,7 +56,6 @@ def get_user_data(id: int, token: str, extended: bool=False) -> User:
         data = dict_user['response'][0]
 
         if extended:
-            fields = data.keys()
             values = {}
 
             values['about'] = data.get('about', None)
