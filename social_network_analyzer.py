@@ -96,13 +96,12 @@ class SocialNetworkAnalyzer:
             results['Степень влиятельности'] = [self.eigenvector.get(node, 0) for node in self.graph.nodes()]
         if self.pagerank:
             results['PageRank'] = [self.pagerank.get(node, 0) for node in self.graph.nodes()]
-        if self.communities and self.partition:
+        if self.partition:
             results['Сообщества'] = [self.partition.get(node, -1) for node in self.graph.nodes()]
 
         if not self.betweenness \
             and not self.eigenvector \
             and not self.pagerank \
-            and not self.communities \
             and not self.partition:
             print('Ошибка: метрики не вычислены')
             return
@@ -115,7 +114,6 @@ class SocialNetworkAnalyzer:
 
         # Создание множества уникальных пользователей
         users = set(self.edges['Source']).union(set(self.edges['Target']))
-        print(f'Число уникальных счетов: {len(users)}')
 
         # Определение оболочек для раскладки shell
         shells = [[target_user_id], [ele for ele in users if ele != target_user_id]]
@@ -233,7 +231,7 @@ class SocialNetworkAnalyzer:
         for node in self.graph.nodes():
             x, y = self.graph.nodes[node]['pos']
             user_id = self.graph.nodes[node].get('ID', 'Неизвестно2')
-            customer_name = self.graph.nodes[node].get('Name', 'Неизвестно2')
+            name = self.graph.nodes[node].get('Name', 'Неизвестно2')
 
             if self.betweenness:
                 node_size = self.betweenness.get(node, 0) * 35 + 15
@@ -247,7 +245,7 @@ class SocialNetworkAnalyzer:
             else:
                 node_color = '#ff9f0f'
             hovertext = (f'ID: {user_id}<br>'
-                         f'Имя: {customer_name}<br>'
+                         f'Имя: {name}<br>'
                          f'Сообщество: {community_id if community_id >= 0 else "Нет"}<br>')
             node_trace['x'] += (x,)
             node_trace['y'] += (y,)
