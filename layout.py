@@ -121,6 +121,12 @@ layout = html.Div([
                             dcc.Graph(
                                 id='interactive-graph',
                                 figure=None,
+                                config={
+                                    'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d'],
+                                    'displayModeBar': True,
+                                    'displayLogo': False,
+                                    'scrollZoom': True,
+                                },
                             ),
                         ],
                     ),
