@@ -67,6 +67,7 @@ class SocialNetworkAnalyzer:
             return
 
         self.communities = louvain_communities(self.graph, resolution=resolution, seed=seed)
+        self.communities = sorted(self.communities, key=len, reverse=True)
         self.partition = {}
 
         for i, comm in enumerate(self.communities):
