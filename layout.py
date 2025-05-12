@@ -4,13 +4,6 @@ from dash import dcc
 from dash import html
 
 
-tabs_style = {
-    'width' : '100%',
-    'display' : 'flex',
-    'flexWrap' : 'wrap',
-    'justifyContent' : 'flex-start',
-}
-
 tab_style_1 = {
     'borderTop' : '1px solid #cccccc',
     'borderBottom' : '1px solid #cccccc',
@@ -40,7 +33,6 @@ layout = html.Div([
         id='title',
         className='row',
         children=[html.H1('Анализ дружеских связей пользователя ВК')],
-        style={'textAlign': 'center'},
     ),
     ###################################### Главный ряд ######################################
     html.Div(
@@ -50,7 +42,6 @@ layout = html.Div([
             ###################################### Левая панель ######################################
             html.Div(
                 id='left-bar',
-                className='three columns',
                 children=[
                     ###################################### Target user ID section ######################################
                     html.Div(
@@ -93,10 +84,9 @@ layout = html.Div([
                             ),
                             dcc.Markdown(
                                 id='target-user-id-error',
-                                style={'color': 'red'},
+                                # style={'color': 'red'},
                             ),
                         ],
-                        style={'height': '340px'},
                     ),
                     ###################################### User data section ######################################
                     html.Div(
@@ -116,85 +106,75 @@ layout = html.Div([
                             ),
                             html.Pre(
                                 id='user-data-by-click',
-                                style={
-                                    'font-family': 'Tahoma, Verdana, sans-serif',
-                                    'text-size': '16px',
-                                    'line-height': '18px',
-                                },
                             ),
                         ],
-                        style={'height': '300px'},
                     ),
                 ],
             ),
-
-            ###################################### Граф в центре ######################################
+            ###################################### Граф и таблицы (флекс) ######################################
             html.Div(
-                className='five columns',
+                id='graph-and-tables-flex',
                 children=[
+                    ###################################### Граф в центре ######################################
                     html.Div(
-                        className='twelve columns',
+                        className='eight columns',
                         children=[
-                            html.H3('Граф дружеских связей'),
+                            dcc.Graph(
+                                id='interactive-graph',
+                                figure=None,
+                            ),
                         ],
-                        style={'textAlign': 'center'},
                     ),
-                    dcc.Graph(
-                        id='interactive-graph',
-                        figure=None,
-                    ),
-                ],
-            ),
 
-            ###################################### Таблица справа ######################################
-            html.Div(
-                id='tables-section',
-                className='four columns',
-                children=[
-                    dcc.Tabs(
-                        id='tables-tabs',
-                        className='twelve columns',
-                        value='tab-1-friends-table',
+                    ###################################### Таблица справа ######################################
+                    html.Div(
+                        id='tables-section',
+                        className='four columns',
                         children=[
-                            dcc.Tab(
+                            dcc.Tabs(
+                                id='tables-tabs',
+                                className='twelve columns',
                                 value='tab-1-friends-table',
-                                label='Друзья',
-                                style=tab_style_1,
-                                selected_style=tab_style_sel_1,
+                                children=[
+                                    dcc.Tab(
+                                        value='tab-1-friends-table',
+                                        label='Друзья',
+                                        style=tab_style_1,
+                                        selected_style=tab_style_sel_1,
+                                    ),
+                                    dcc.Tab(
+                                        value='tab-5-communities-table',
+                                        label='Сообщества',
+                                        style=tab_style_1,
+                                        selected_style=tab_style_sel_1,
+                                    ),
+                                    dcc.Tab(
+                                        value='tab-4-pagerank-table',
+                                        label='PageRank',
+                                        style=tab_style_1,
+                                        selected_style=tab_style_sel_1,
+                                    ),
+                                    dcc.Tab(
+                                        value='tab-2-betweenness-table',
+                                        label='Посредническая центральность',
+                                        style=tab_style_2,
+                                        selected_style=tab_style_sel_2,
+                                    ),
+                                    dcc.Tab(
+                                        value='tab-3-eigenvector-table',
+                                        label='Степень влиятельности',
+                                        style=tab_style_2,
+                                        selected_style=tab_style_sel_2,
+                                    ),
+                                ],
                             ),
-                            dcc.Tab(
-                                value='tab-5-communities-table',
-                                label='Сообщества',
-                                style=tab_style_1,
-                                selected_style=tab_style_sel_1,
-                            ),
-                            dcc.Tab(
-                                value='tab-4-pagerank-table',
-                                label='PageRank',
-                                style=tab_style_1,
-                                selected_style=tab_style_sel_1,
-                            ),
-                            dcc.Tab(
-                                value='tab-2-betweenness-table',
-                                label='Посредническая центральность',
-                                style=tab_style_2,
-                                selected_style=tab_style_sel_2,
-                            ),
-                            dcc.Tab(
-                                value='tab-3-eigenvector-table',
-                                label='Степень влиятельности',
-                                style=tab_style_2,
-                                selected_style=tab_style_sel_2,
+                            html.Div(
+                                id='table-place',
+                                className='twelve columns',
+                                style={
+                                }
                             ),
                         ],
-                        style=tabs_style,
-                    ),
-                    html.Div(
-                        id='table-place',
-                        className='twelve columns',
-                        style={
-                            'height': '70vh',
-                        }
                     ),
                 ],
             ),
