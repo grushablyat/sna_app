@@ -1,4 +1,5 @@
 /.idea/
-/dumps/*.json
-/interactive_html_graphs/
-config.py
+
+/dumps/
+/tables/
+/test/
