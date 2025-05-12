@@ -15,6 +15,8 @@ app = dash.Dash(__name__)
 app.title = 'Анализ дружеских связей пользователя ВК'
 app.layout = layout
 
+[os.mkdir(d) for d in (TABLES, DUMPS) if not os.path.exists(d)]
+
 
 # Start analysis
 @app.callback(
