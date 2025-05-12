@@ -59,14 +59,16 @@ def target_user_id_button_clicked(n_clicks, input_value, options, access_token):
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
             break
 
-        metrics_filename = f'{TABLES}/metrics_{input_value}.csv'
-
         analyzer = SocialNetworkAnalyzer()
         analyzer.load_from_edges(friends, relations)
 
-        analyzer.calculate_centralities()
-        analyzer.detect_communities()
-        analyzer.save_results(metrics_filename)
+        metrics_filename = f'{TABLES}/metrics_{input_value}.csv'
+        if 'import' in options and os.path.exists(metrics_filename):
+            analyzer.load_metrics(metrics_filename)
+        else:
+            analyzer.calculate_centralities()
+            analyzer.detect_communities()
+            analyzer.save_results(metrics_filename)
 
         result['interactive-graph'] = analyzer.create_interactive_graph(input_value)
         break

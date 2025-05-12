@@ -77,6 +77,14 @@ class SocialNetworkAnalyzer:
         self.modularity_score = modularity(self.graph, self.communities)
         print(f"Сообщества обнаружены: {len(self.communities)} сообществ, модулярность = {self.modularity_score:.3f}")
 
+    def load_metrics(self, metrics_filename):
+        df = pd.read_csv(metrics_filename)
+
+        self.betweenness.update({row['ID']: row['Посредническая центральность'] for _, row in df.iterrows()})
+        self.eigenvector.update({row['ID']: row['Степень влиятельности'] for _, row in df.iterrows()})
+        self.pagerank.update({row['ID']: row['PageRank'] for _, row in df.iterrows()})
+        self.partition.update({row['ID']: row['Сообщества'] for _, row in df.iterrows()})
+
     def save_results(self, metrics_filename='network_metrics.csv'):
         if not self.graph.nodes:
             print("Ошибка: граф пуст")
