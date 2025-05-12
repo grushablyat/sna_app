@@ -2,6 +2,7 @@ import codecs
 import json
 import math
 
+import portalocker
 from time import sleep, time
 from typing import Collection
 from urllib.error import HTTPError
@@ -15,6 +16,10 @@ DUMPS = 'dumps'
 
 VK_API_TIMING = 0.21
 VK_API_SIMULTANEOUS_APPEALS = 25
+
+FILE_OPEN_MAX_ATTEMPTS = 10
+FILE_OPEN_WAIT_INTERVAL = 0.1
+
 
 # Отправка HTTP-запроса
 def send_request(url: str, fields: dict) -> str:
@@ -171,8 +176,7 @@ def fast_extract_fr_friends_json(ids: list[int], token: str) -> list[str]:
                  for k, v in dict_resp['response'].items()]
             )
         except KeyError as e:
-            print(e)
-            print(str_resp)
+            raise Exception('KeyError')
 
         extract_time = time() - start
         if extract_time < VK_API_TIMING:
@@ -378,13 +382,28 @@ def simple_export(id: int, users: Collection[User], relations: Collection[tuple]
 
     filename = f'{DUMPS}/{filename}'
 
-    file = codecs.open(filename, 'w', encoding='utf-8')
-    for user in users:
-        file.write(f'{user.id},{user.first_name},{user.last_name}\n')
-    for relation in relations:
-        file.write(relation.__str__() + '\n')
+    for _ in range(FILE_OPEN_MAX_ATTEMPTS):
+        try:
+            with codecs.open(filename, 'w', encoding='utf-8') as file:
+                portalocker.lock(file, portalocker.LOCK_EX)
 
-    file.close()
+                try:
+                    for user in users:
+                        file.write(f'{user.id},{user.first_name},{user.last_name}\n')
+                    for relation in relations:
+                        file.write(relation.__str__() + '\n')
+                finally:
+                    portalocker.unlock(file)
+                return
+
+        except portalocker.LockException as e:
+            print(f'Файл заблокирован')
+            sleep(FILE_OPEN_WAIT_INTERVAL)
+        except IOError as e:
+            print(f'Файл открыт другим процессом')
+            sleep(FILE_OPEN_WAIT_INTERVAL)
+
+    raise Exception('Не удалось получить доступ к файлу')
 
 
 # Простой импорт из TXT готовых объектов пользователей и отношений
@@ -397,21 +416,36 @@ def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
     users = set()
     relations = set()
 
-    file = codecs.open(filename, 'r', encoding='utf-8')
-    for line in file.readlines():
-        if line.startswith('('):
-            relations.add(tuple(map(int, line[1:-2].split(', '))))
-        else:
-            data = line[:-1].split(',')
-            users.add(User(
-                int(data[0]),
-                data[1],
-                data[2],
-            ))
 
-    file.close()
+    for _ in range(FILE_OPEN_MAX_ATTEMPTS):
+        try:
+            with codecs.open(filename, 'r', encoding='utf-8') as file:
+                portalocker.lock(file, portalocker.LOCK_EX)
 
-    return users, relations
+                try:
+                    for line in file.readlines():
+                        if line.startswith('('):
+                            relations.add(tuple(map(int, line[1:-2].split(', '))))
+                        else:
+                            data = line[:-1].split(',')
+                            users.add(User(
+                                int(data[0]),
+                                data[1],
+                                data[2],
+                            ))
+                finally:
+                    portalocker.unlock(file)
+
+                return users, relations
+
+        except portalocker.LockException as e:
+            print(f'Файл заблокирован')
+            sleep(FILE_OPEN_WAIT_INTERVAL)
+        except IOError as e:
+            print(f'Файл открыт другим процессом')
+            sleep(FILE_OPEN_WAIT_INTERVAL)
+
+    raise Exception('Не удалось получить доступ к файлу')
 
 
 if __name__ == '__main__':

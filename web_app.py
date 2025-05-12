@@ -45,11 +45,15 @@ def target_user_id_button_clicked(n_clicks, input_value, options, access_token):
             result['target-user-id-error'] = 'Некорректный ID, возможно отсутствует Интернет-соединение'
             break
 
-        if 'import' in options and os.path.exists(f'{DUMPS}/dump_{input_value}.txt'):
-            friends, relations = simple_import(input_value)
-        else:
-            friends, relations = fast_get_friends(input_value, access_token)
-            simple_export(input_value, friends, relations)
+        try:
+            if 'import' in options and os.path.exists(f'{DUMPS}/dump_{input_value}.txt'):
+                friends, relations = simple_import(input_value)
+            else:
+                friends, relations = fast_get_friends(input_value, access_token)
+                simple_export(input_value, friends, relations)
+        except Exception as e:
+            result['target-user-id-error'] = 'Произошла ошибка, попробуйте снова'
+            break
 
         if not relations:
             result['target-user-id-error'] = 'Некорректный ID, возможно у пользователя закрытый профиль'
