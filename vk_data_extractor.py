@@ -380,7 +380,7 @@ def simple_export(id: int, users: Collection[User], relations: Collection[tuple]
 
     file = codecs.open(filename, 'w', encoding='utf-8')
     for user in users:
-        file.write(user.__str__() + '\n')
+        file.write(f'{user.id},{user.first_name},{user.last_name}\n')
     for relation in relations:
         file.write(relation.__str__() + '\n')
 
@@ -402,12 +402,11 @@ def simple_import(id: int, filename: str=None) -> (set[User], set[tuple]):
         if line.startswith('('):
             relations.add(tuple(map(int, line[1:-2].split(', '))))
         else:
-            data = line[:-1].split(' ')
+            data = line[:-1].split(',')
             users.add(User(
                 int(data[0]),
                 data[1],
                 data[2],
-                bool(data[3]),
             ))
 
     file.close()
