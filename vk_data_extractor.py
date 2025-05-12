@@ -13,8 +13,8 @@ from user import User
 
 DUMPS = 'dumps'
 
-TIMING = 0.21
-SIMULTANEOUS_APPEALS = 25
+VK_API_TIMING = 0.21
+VK_API_SIMULTANEOUS_APPEALS = 25
 
 # Отправка HTTP-запроса
 def send_request(url: str, fields: dict) -> str:
@@ -153,10 +153,10 @@ def fast_extract_fr_friends_json(ids: list[int], token: str) -> list[str]:
     result_jsons = []
     start = time()
 
-    for i in range(math.ceil(len(ids)/SIMULTANEOUS_APPEALS)):
+    for i in range(math.ceil(len(ids) / VK_API_SIMULTANEOUS_APPEALS)):
         script = 'return {'
-        for j in range(SIMULTANEOUS_APPEALS):
-            k = i*SIMULTANEOUS_APPEALS + j
+        for j in range(VK_API_SIMULTANEOUS_APPEALS):
+            k = i * VK_API_SIMULTANEOUS_APPEALS + j
             if k < len(ids):
                 script += f'"{ids[k]}": API.friends.get({{"user_id": {ids[k]}, "fields": "bdate"}}),'
         script = script[:-1] + '};'
@@ -175,8 +175,8 @@ def fast_extract_fr_friends_json(ids: list[int], token: str) -> list[str]:
             print(str_resp)
 
         extract_time = time() - start
-        if extract_time < TIMING:
-            sleep(TIMING - extract_time)
+        if extract_time < VK_API_TIMING:
+            sleep(VK_API_TIMING - extract_time)
         start = time()
 
     return result_jsons
@@ -223,7 +223,7 @@ def get_friends_and_friends(id: int, add_fr_friends: bool=False) -> (set[User], 
     users_ids = set([friend.id for friend in friends])
 
     for friend in list(friends):
-        sleep(TIMING)
+        sleep(VK_API_TIMING)
         fr_friends, fr_relations = get_friends(friend.id)
         if add_fr_friends:
             friends.update(fr_friends)
@@ -309,7 +309,7 @@ def export_to_json(id: int, connect_fr_friends: bool=False, filename: str=None) 
     file.write(str_friends + ',\n')
 
     for friend in friends:
-        sleep(TIMING)
+        sleep(VK_API_TIMING)
         str_fr_friends = extract_friends_json(friend.id)
         file.write(str_fr_friends + ',\n')
 
@@ -317,7 +317,7 @@ def export_to_json(id: int, connect_fr_friends: bool=False, filename: str=None) 
 
         if connect_fr_friends:
             for fr_friend in fr_friends:
-                sleep(TIMING)
+                sleep(VK_API_TIMING)
                 str_fr_fr_friends = extract_friends_json(fr_friend.id)
                 file.write(str_fr_fr_friends + ',\n')
 
