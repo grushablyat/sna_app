@@ -84,7 +84,6 @@ layout = html.Div([
                             ),
                             dcc.Markdown(
                                 id='target-user-id-error',
-                                # style={'color': 'red'},
                             ),
                         ],
                     ),
@@ -171,8 +170,6 @@ layout = html.Div([
                             html.Div(
                                 id='table-place',
                                 className='twelve columns',
-                                style={
-                                }
                             ),
                         ],
                     ),
