@@ -54,7 +54,7 @@ class User:
             info += f'\n    {school}'
 
         if self.relatives:
-            info += '\n\nРодственники'
+            info += '\n\nРодственники:'
         for relative in self.relatives:
             info += f'\n    {relative[0]}: {relative[1]}'
 
