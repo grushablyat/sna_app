@@ -2,6 +2,7 @@ from textwrap import dedent as d
 
 from dash import dcc
 from dash import html
+import plotly.graph_objects as go
 
 
 tab_style_1 = {
@@ -120,12 +121,21 @@ layout = html.Div([
                         children=[
                             dcc.Graph(
                                 id='interactive-graph',
-                                figure=None,
+                                figure={
+                                    'data': [],
+                                    'layout': go.Layout(
+                                        dragmode='pan',
+                                    ),
+                                },
                                 config={
-                                    'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d'],
-                                    'displayModeBar': True,
+                                    'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d', 'zoom2d'],
                                     'displayLogo': False,
+                                    'displayModeBar': True,
                                     'scrollZoom': True,
+                                },
+                                style={
+                                    'height': '90vh',
+                                    'width': '100%',
                                 },
                             ),
                         ],

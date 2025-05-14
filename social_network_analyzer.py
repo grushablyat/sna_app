@@ -210,12 +210,12 @@ class SocialNetworkAnalyzer:
             return {
                 'data': traceRecode,
                 'layout': go.Layout(
+                    dragmode='pan',
                     title='Ошибка: в графе нет связей',
                     showlegend=False,
                     margin={'b': 40, 'l': 40, 'r': 40, 't': 40},
                     xaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
                     yaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                    height=600
                 )
             }
 
@@ -283,12 +283,13 @@ class SocialNetworkAnalyzer:
         figure = {
             'data': traceRecode,
             'layout': go.Layout(
+                dragmode='pan',
                 title=f'Друзья пользователя {target_user_id} (Модулярность: {self.modularity_score:.4f})',
                 showlegend=False, hovermode='closest',
                 margin={'b': 40, 'l': 40, 'r': 40, 't': 40},
                 xaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
                 yaxis={'showgrid': False, 'zeroline': False, 'showticklabels': False},
-                height=600, clickmode='event+select'
+                clickmode='event+select'
             )
         }
         return figure
